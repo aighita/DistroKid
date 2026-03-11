@@ -8,4 +8,5 @@ public class Merch : BaseEntity
     public string Description { get; set; } = null!;
     public decimal Price { get; set; }
     public int StockQuantity { get; set; }
+    public Artist Artist { get; set; } = null!;
 }

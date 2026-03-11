@@ -2,6 +2,8 @@
 
 Full-stack web application built with .NET 10 backend and Next.js frontend. Demonstrates REST API development, database management, JWT authentication, and client-side development.
 
+[![.NET](https://img.shields.io/badge/.NET-10-512BD4?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/) [![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-10-512BD4?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/) [![Next.js](https://img.shields.io/badge/Next.js-React-000?style=flat-square&logo=nextdotjs)](https://nextjs.org/) [![React](https://img.shields.io/badge/React-18+-61DAFB?style=flat-square&logo=react)](https://react.dev/) [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Latest-336791?style=flat-square&logo=postgresql)](https://www.postgresql.org/) [![JWT](https://img.shields.io/badge/JWT-Authentication-000?style=flat-square&logo=jsonwebtokens)](https://jwt.io/)
+
 ## Tech Stack
 
 - Backend: .NET 10, ASP.NET Core

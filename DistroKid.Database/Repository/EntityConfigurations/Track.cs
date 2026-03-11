@@ -17,5 +17,11 @@ public class TrackConfiguration : IEntityTypeConfiguration<Track>
             .IsRequired();
         builder.Property(e => e.DurationInSeconds)
             .IsRequired();
+        builder.Property(e => e.ISRC)
+            .HasMaxLength(15)
+            .IsRequired();
+        builder.HasOne(e => e.Artist)
+            .WithMany(a => a.Tracks)
+            .HasForeignKey("ArtistId");
     }
 }
