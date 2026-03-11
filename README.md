@@ -1,34 +1,82 @@
 ﻿# DistroKid
 
-This is an example application to teach students the basics of web programming.
+Full-stack web application built with .NET 10 backend and Next.js frontend. Demonstrates REST API development, database management, JWT authentication, and client-side development.
 
-Prerequisites:
-Because we use .NET 8 for this project you need to install a IDE with the necessary tool, we recommend Visual Studio 2022 Community Edition (https://visualstudio.microsoft.com/) or Enterprise Edition for students (https://azureforeducation.microsoft.com/devtools) if you are using Windows or the DotUltimate platform (https://www.jetbrains.com/dotnet/) with Rider for .NET for students (https://www.jetbrains.com/rider/) if you are using Linux or MacOS X, you can get a license for all JetBrains products via your academic email. For Visual Studio we also recommend the DotUltimate platform for the ReSharper plugin, it may slow down your IDE but you gain a better code suggestions and safety checks. 
+## Tech Stack
 
-To start working with the backend install docker and docker compose from https://docs.docker.com/engine/install/ and enter the command below to launch the Postgresql database while in the Deployment folder:
+- Backend: .NET 10, ASP.NET Core
+- Frontend: Next.js, React
+- Database: PostgreSQL
+- Authentication: JWT
 
-```sh
-docker-compose -f .\docker-compose.yml -p mobylab-app-db up -d
-```
+## Setup
 
-You can use PGAdmin (https://www.pgadmin.org/) or DBeaver (https://dbeaver.io/download/) to access the database on localhost:5432 with database/user/password "mobylab-app". 
+### Prerequisites
 
-To work with the database migrations in .NET install the dotnet-ef tool by using the following command:
+- .NET 10 SDK
+- Docker and Docker Compose
+- Node.js 18+ and npm
 
-```sh
+### Quick Start
+
+1. Install Entity Framework tools:
+```powershell
 dotnet tool install --global dotnet-ef --version 10.*
 ```
 
-To create a new migration use the following command and replace migration_name with the name of your new migration, usually the first migration is called "InitialCreate":
-
-```sh
-dotnet ef migrations add <migration_name> --context WebAppDatabaseContext --project .\DistroKid.Database --startup-project .\DistroKid.Api
+2. Start PostgreSQL database:
+```powershell
+cd .\DistroKid.Deployment
+docker-compose -f .\docker-compose.yml -p distrokid-db up -d
 ```
 
-Example for the first migration:
-
-```sh
-dotnet ef migrations add InitialCreate --context WebAppDatabaseContext --project .\DistroKid.Database --startup-project .\DistroKid.Api
+3. Create and apply migrations:
+```powershell
+cd .\DistroKid.Database
+.\migrate.ps1 -name InitialMigration -update
 ```
 
-The project has a worker service that will initialize the database with a first admin user. To log in the default user is "admin@default.com" with password "default".
+4. Start the backend:
+```powershell
+cd ..\DistroKid.Api
+dotnet run
+```
+
+5. Start the frontend (optional):
+```powershell
+cd ..\DistroKid.Client
+npm install
+npm run dev
+```
+
+## Access
+
+- Frontend: http://localhost:5000/
+- API: http://localhost:5000/api/
+- Swagger: http://localhost:5000/swagger
+
+## Architecture
+
+This project demonstrates Next.js Static Site Generation (SSG) with static file serving through a .NET package. The Next.js frontend is pre-built into static files and served directly by the ASP.NET Core backend using the `NextjsStaticHosting` package. This approach:
+
+- Builds the Next.js application once into static HTML, CSS, and JavaScript files
+- Serves frontend and backend from the same localhost:5000 endpoint
+- Eliminates the need for a separate frontend server in production
+- Shows how to integrate modern frontend frameworks with .NET backends
+
+## Default Credentials
+
+- Email: admin@default.com
+- Password: default
+
+## Database Migrations
+
+Create a new migration:
+```powershell
+cd .\DistroKid.Database
+.\migrate.ps1 -name <MigrationName> -update
+```
+
+## License
+
+Educational material. See [LICENSE.md](LICENSE.md).

@@ -64,6 +64,31 @@ public class UserService(IRepository<WebAppDatabaseContext> repository, ILoginSe
         });
     }
 
+    public async Task<ServiceResponse<RegisterResponseRecord>> Register(RegisterRecord register, CancellationToken cancellationToken = default)
+    {
+        var result = await repository.GetAsync(new UserSpec(register.Email), cancellationToken);
+
+        if (result != null) // Verify if the user already exists in the database.
+        {
+            return ServiceResponse.FromError<RegisterResponseRecord>(new(HttpStatusCode.Conflict, "The user already exists!", ErrorCodes.UserAlreadyExists));
+        }
+
+        await repository.AddAsync(new User
+        {
+            Email = register.Email,
+            Name = register.Name,
+            Role = register.Role,
+            Password = register.Password
+        }, cancellationToken); // A new entity is created and persisted in the database.
+
+        // await mailService.SendMail(register.Email, "Welcome!", MailTemplates.UserAddTemplate(register.Name), true, "My App", cancellationToken); // You can send a notification on the user email. Change the email if you want.
+
+        return ServiceResponse.ForSuccess(new RegisterResponseRecord
+        {
+            Message = "User registered successfully!"
+        });
+    }
+
     public async Task<ServiceResponse<int>> GetUserCount(CancellationToken cancellationToken = default) => 
         ServiceResponse.ForSuccess(await repository.GetCountAsync<User>(cancellationToken)); // Get the count of all user entities in the database.
 

@@ -1,4 +1,5 @@
 using DistroKid.Infrastructure.BaseObjects;
+using DistroKid.Database.Repository.Enums;
 
 namespace DistroKid.Database.Repository.Entities;
 

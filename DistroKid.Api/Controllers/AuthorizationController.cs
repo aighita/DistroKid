@@ -23,4 +23,13 @@ public class AuthorizationController(ILogger<AuthorizationController> logger, IU
     {
         return FromServiceResponse(await userService.Login(login with { Password = PasswordUtils.HashPassword(login.Password)})); // The "with" keyword works only with records and it creates another object instance with the updated properties. 
     }
+
+    /// <summary>
+    /// This method will respond to registration requests.
+    /// </summary>
+    [HttpPost] // This attribute will make the controller respond to a HTTP POST request on the route /api/Authorization/Register having a JSON body deserialized as a RegisterRecord.
+    public async Task<ActionResult<RequestResponse<RegisterResponseRecord>>> Register([FromBody] RegisterRecord register)
+    {
+        return FromServiceResponse(await userService.Register(register with { Password = PasswordUtils.HashPassword(register.Password) }));
+    }
 }

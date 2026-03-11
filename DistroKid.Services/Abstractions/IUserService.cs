@@ -23,6 +23,10 @@ public interface IUserService
     /// </summary>
     public Task<ServiceResponse<LoginResponseRecord>> Login(LoginRecord login, CancellationToken cancellationToken = default);
     /// <summary>
+    /// Register a new user in the system.
+    /// </summary>
+    public Task<ServiceResponse<RegisterResponseRecord>> Register(RegisterRecord register, CancellationToken cancellationToken = default);
+    /// <summary>
     /// GetUserCount returns the number of users in the database.
     /// </summary>
     public Task<ServiceResponse<int>> GetUserCount(CancellationToken cancellationToken = default);

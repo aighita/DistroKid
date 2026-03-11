@@ -29,16 +29,17 @@ public static class Program
 
         var app = builder.Build();
 
+        // Configure API routes and middleware (Swagger, Auth, etc.)
+        app.ConfigureApplication(ApplicationName)
+            .MigrateDatabase<WebAppDatabaseContext>();
+
         // Rewrite clean URL paths to their corresponding static HTML files before serving
         var rewriteOptions = new RewriteOptions()
-            .AddRewrite(@"^(?!_next/)([^/.]+)/.*$", "$1.html", skipRemainingRules: true);
+            .AddRewrite(@"^(?!(_next/|api/))([^/.]+)/.*$", "$2.html", skipRemainingRules: true);
         app.UseRewriter(rewriteOptions);
 
         app.UseDefaultFiles();
         app.UseStaticFiles();
-
-        app.ConfigureApplication(ApplicationName)
-            .MigrateDatabase<WebAppDatabaseContext>();
 
         app.MapNextjsStaticHtmls();
         app.MapFallbackToFile("404.html");
