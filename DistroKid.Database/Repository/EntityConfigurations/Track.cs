@@ -21,7 +21,8 @@ public class TrackConfiguration : IEntityTypeConfiguration<Track>
             .HasMaxLength(15)
             .IsRequired();
         builder.HasOne(e => e.Artist)
-            .WithMany(a => a.Tracks)
-            .HasForeignKey("ArtistId");
+            .WithMany()
+            .HasForeignKey("ArtistId")
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

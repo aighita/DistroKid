@@ -8,5 +8,5 @@ public class Event : BaseEntity
     public string Description { get; set; } = null!;
     public string Location { get; set; } = null!;
     public DateTime Date { get; set; }
-    public Artist Artist { get; set; } = null!;
+    public User Artist { get; set; } = null!;
 }

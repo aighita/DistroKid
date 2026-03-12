@@ -6,13 +6,16 @@ using DistroKid.Infrastructure.Responses;
 using DistroKid.Services.Abstractions;
 using DistroKid.Services.Authorization;
 using DistroKid.Services.DataTransferObjects;
+using DistroKid.Services.Implementations;
 
 namespace DistroKid.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]")]
-public class TrackController : ControllerBase
+public class TrackController(ILogger<TrackController> logger, IUserService userService, ITrackService trackService) : AuthorizedController(logger, userService)
 {
+    protected readonly ITrackService TrackService = trackService;
+
     [Authorize]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<RequestResponse<TrackRecord>>> GetById([FromRoute] Guid id)
