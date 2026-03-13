@@ -11,7 +11,7 @@ using DistroKid.Services.Specifications;
 
 namespace DistroKid.Services.Implementations;
 
-public class LabelService(IRepository<WebAppDatabaseContext> repository) : ILabelService
+public class LabelService : ILabelService
 {
     public async Task<ServiceResponse<LabelRecord>> GetLabelById(Guid id, CancellationToken cancellationToken = default)
     {

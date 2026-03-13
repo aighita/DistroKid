@@ -3,6 +3,7 @@ using System;
 using DistroKid.Database.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DistroKid.Database.Migrations
 {
     [DbContext(typeof(WebAppDatabaseContext))]
-    partial class WebAppDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260313132046_AllEntitiesAndConfigurations")]
+    partial class AllEntitiesAndConfigurations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -240,9 +243,6 @@ namespace DistroKid.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("ArtistLabelId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -251,7 +251,10 @@ namespace DistroKid.Database.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<Guid?>("ManagerLabelId")
+                    b.Property<Guid?>("LabelId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("LabelId1")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
@@ -276,9 +279,9 @@ namespace DistroKid.Database.Migrations
 
                     b.HasAlternateKey("Email");
 
-                    b.HasIndex("ArtistLabelId");
+                    b.HasIndex("LabelId");
 
-                    b.HasIndex("ManagerLabelId");
+                    b.HasIndex("LabelId1");
 
                     b.ToTable("User");
                 });
@@ -400,14 +403,13 @@ namespace DistroKid.Database.Migrations
             modelBuilder.Entity("DistroKid.Database.Repository.Entities.User", b =>
                 {
                     b.HasOne("DistroKid.Database.Repository.Entities.Label", null)
-                        .WithMany("Artists")
-                        .HasForeignKey("ArtistLabelId")
+                        .WithMany("Managers")
+                        .HasForeignKey("LabelId")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("DistroKid.Database.Repository.Entities.Label", null)
-                        .WithMany("Managers")
-                        .HasForeignKey("ManagerLabelId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .WithMany("Artists")
+                        .HasForeignKey("LabelId1");
                 });
 
             modelBuilder.Entity("DistroKid.Database.Repository.Entities.UserFile", b =>

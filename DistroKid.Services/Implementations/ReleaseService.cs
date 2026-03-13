@@ -11,7 +11,7 @@ using DistroKid.Services.Specifications;
 
 namespace DistroKid.Services.Implementations;
 
-public class ReleaseService(IRepository<WebAppDatabaseContext> repository) : IReleaseService
+public class ReleaseService : IReleaseService
 {
     public async Task<ServiceResponse<ReleaseRecord>> GetReleaseById(Guid id, CancellationToken cancellationToken = default)
     {

@@ -6,9 +6,9 @@ using DistroKid.Database.Repository.Entities;
 namespace DistroKid.Database.Repository.EntityConfigurations;
 
 
-public class ReleaseConfiguration : IEntityTypeConfiguration<Release>
+public class EventConfiguration : IEntityTypeConfiguration<Event>
 {
-    public void Configure(EntityTypeBuilder<Release> builder)
+    public void Configure(EntityTypeBuilder<Event> builder)
     {
         builder.Property(e => e.Id)
             .IsRequired();

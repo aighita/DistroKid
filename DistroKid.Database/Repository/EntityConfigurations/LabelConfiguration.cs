@@ -10,7 +10,7 @@ public class LabelConfiguration : IEntityTypeConfiguration<Label>
 {
     public void Configure(EntityTypeBuilder<Label> builder)
     {
-        builder.property(e => e.Id)
+        builder.Property(e => e.Id)
             .IsRequired();
         builder.HasKey(x => x.Id);
         builder.Property(e => e.Name)
@@ -19,23 +19,17 @@ public class LabelConfiguration : IEntityTypeConfiguration<Label>
         builder.Property(e => e.Website)
             .HasMaxLength(500)
             .IsRequired();
-        builder.Property(e => e.Releases)
-            .WithMany()
-            .HasForeignKey("LabelId");
-        builder.Property(e => e.Artists)
-            .WithMany()
-            .HasForeignKey("LabelId");
         builder.HasMany(e => e.Releases)
             .WithOne()
             .HasForeignKey("LabelId")
             .OnDelete(DeleteBehavior.SetNull);
         builder.HasMany(e => e.Artists)
             .WithOne()
-            .HasForeignKey("LabelId")
+            .HasForeignKey("ArtistLabelId")
             .OnDelete(DeleteBehavior.SetNull);
         builder.HasMany(e => e.Managers)
             .WithOne()
-            .HasForeignKey("LabelId")
+            .HasForeignKey("ManagerLabelId")
             .OnDelete(DeleteBehavior.SetNull);
     }
 }

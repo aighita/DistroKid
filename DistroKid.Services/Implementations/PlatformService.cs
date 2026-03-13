@@ -11,7 +11,7 @@ using DistroKid.Services.Specifications;
 
 namespace DistroKid.Services.Implementations;
 
-public class PlatformService(IRepository<WebAppDatabaseContext> repository) : IPlatformService
+public class PlatformService : IPlatformService
 {
     public async Task<ServiceResponse<PlatformRecord>> GetPlatformById(Guid id, CancellationToken cancellationToken = default)
     {

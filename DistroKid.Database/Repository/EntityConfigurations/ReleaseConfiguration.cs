@@ -26,10 +26,10 @@ public class ReleaseConfiguration : IEntityTypeConfiguration<Release>
             .HasConversion(new EnumToStringConverter<ReleaseTypeEnum>())
             .IsRequired();
         builder.HasMany(e => e.Tracks)
-            .WithMany()
-            .HasForeignKey("ReleaseId");
+            .WithMany(t => t.Releases)
+            .UsingEntity("ReleaseTrack");
         builder.HasMany(e => e.Platforms)
-            .WithMany()
-            .HasForeignKey("ReleaseId");
+            .WithMany(p => p.Releases)
+            .UsingEntity("PlatformReleases");
     }
 }

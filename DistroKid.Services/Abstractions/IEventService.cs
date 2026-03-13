@@ -1,6 +1,6 @@
 using DistroKid.Infrastructure.Requests;
 using DistroKid.Infrastructure.Responses;
-using DistroKid.Service.DataTransferObjects;
+using DistroKid.Services.DataTransferObjects;
 
 namespace DistroKid.Services.DataTransferObjects;
 

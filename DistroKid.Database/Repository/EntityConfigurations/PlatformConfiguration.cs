@@ -20,7 +20,7 @@ public class PlatformConfiguration : IEntityTypeConfiguration<Platform>
             .HasMaxLength(500)
             .IsRequired();
         builder.HasMany(e => e.Releases)
-            .WithMany()
-            .HasForeignKey("PlatformId");
+            .WithMany(r => r.Platforms)
+            .UsingEntity("PlatformReleases");
     }
 }

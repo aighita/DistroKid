@@ -8,7 +8,7 @@ namespace DistroKid.Database.Repository.EntityConfigurations;
 
 public class MerchConfiguration : IEntityTypeConfiguration<Merch>
 {
-    public void Configuration(EntityTypeBuilder<Merch> builder)
+    public void Configure(EntityTypeBuilder<Merch> builder)
     {
         builder.Property(e => e.Id) 
             .IsRequired();

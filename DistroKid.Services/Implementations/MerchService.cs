@@ -11,7 +11,7 @@ using DistroKid.Services.Specifications;
 
 namespace DistroKid.Services.Implementations;
 
-public class MerchService(IRepository<WebAppDatabaseContext> repository) : IMerchService
+public class MerchService : IMerchService
 {
     public async Task<ServiceResponse<MerchRecord>> GetMerchById(Guid id, CancellationToken cancellationToken = default)
     {

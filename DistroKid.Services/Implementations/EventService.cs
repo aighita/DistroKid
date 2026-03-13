@@ -11,7 +11,7 @@ using DistroKid.Services.Specifications;
 
 namespace DistroKid.Services.Implementations;
 
-public class EventService(IRepository<WebAppDatabaseContext> repository) : IEventService
+public class EventService : IEventService
 {
     public async Task<ServiceResponse<EventRecord>> GetEventById(Guid id, CancellationToken cancellationToken = default)
     {

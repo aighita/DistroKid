@@ -8,4 +8,5 @@ public class Track : BaseEntity
     public int DurationInSeconds { get; set; }
     public string ISRC { get; set; } = null!;
     public User Artist { get; set; } = null!;
+    public List<Release> Releases { get; set; } = new List<Release>();
 }

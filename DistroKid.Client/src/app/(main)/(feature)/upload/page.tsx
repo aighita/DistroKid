@@ -1,71 +1,77 @@
+'use client';
+
+import { useState } from "react";
+
 export default function Upload() {
+  const [dragActive, setDragActive] = useState(false);
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    // Handle file drop here
+  };
+
   return (
-    <div className="min-h-screen bg-gray-950 text-white px-6 py-12 md:px-16 lg:px-24">
+    <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center px-8 py-12">
       {/* Header */}
-      <div className="flex items-center justify-between mb-10">
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight">Upload Music</h1>
-          <p className="text-gray-400 mt-2">Distribute your music to the world</p>
-        </div>
+      <div className="text-center mb-16 max-w-2xl">
+        <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-4">
+          <span className="bg-gradient-to-r from-[#5227FF] via-[#7C4DFF] to-[#B19EEF] bg-clip-text text-transparent">
+            Upload Your Music
+          </span>
+        </h1>
+        <p className="text-lg text-muted-foreground">
+          Share your tracks with the world. Upload in MP3, WAV, FLAC, or AAC format.
+        </p>
       </div>
 
-      {/* Upload Area */}
-      <div className="rounded-2xl border-2 border-dashed border-gray-700 bg-gray-900 p-16 flex flex-col items-center justify-center text-center mb-10 hover:border-[#5227FF] transition-colors cursor-pointer">
-        <div className="w-16 h-16 rounded-full bg-[#5227FF]/20 flex items-center justify-center mb-4">
-          <svg className="w-8 h-8 text-[#5227FF]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-          </svg>
-        </div>
-        <h2 className="text-xl font-semibold mb-2">Drop your files here</h2>
-        <p className="text-gray-400 text-sm mb-6">Supports MP3, WAV, FLAC, AAC · Max 500MB per file</p>
-        <button className="rounded-full bg-[#5227FF] px-6 py-2.5 text-sm font-medium hover:bg-[#6B3FFF] transition-colors">
-          Browse Files
-        </button>
-      </div>
+      {/* Drop Zone */}
+      <div
+        onDragEnter={handleDrag}
+        onDragLeave={handleDrag}
+        onDragOver={handleDrag}
+        onDrop={handleDrop}
+        className={`group relative w-full max-w-2xl rounded-3xl border-2 border-dashed transition-all duration-300 cursor-pointer ${
+          dragActive
+            ? "border-[#5227FF] bg-[#5227FF]/5 shadow-lg shadow-[#5227FF]/20"
+            : "border-gray-600 hover:border-[#5227FF]/60 bg-gradient-to-br from-background to-gray-900/50 hover:shadow-lg hover:shadow-[#5227FF]/10"
+        }`}
+      >
+        <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#5227FF]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-      {/* Release Details */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="rounded-xl border border-gray-800 bg-gray-900 p-6">
-          <h3 className="text-lg font-semibold mb-4">Release Info</h3>
-          <div className="flex flex-col gap-4">
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">Title</label>
-              <input className="w-full rounded-lg bg-gray-800 border border-gray-700 px-4 py-2.5 text-sm outline-none focus:border-[#5227FF]" placeholder="Release title" />
-            </div>
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">Artist</label>
-              <input className="w-full rounded-lg bg-gray-800 border border-gray-700 px-4 py-2.5 text-sm outline-none focus:border-[#5227FF]" placeholder="Artist name" />
-            </div>
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">Release Type</label>
-              <select className="w-full rounded-lg bg-gray-800 border border-gray-700 px-4 py-2.5 text-sm outline-none focus:border-[#5227FF]">
-                <option>Single</option>
-                <option>EP</option>
-                <option>Album</option>
-              </select>
-            </div>
+        <div className="relative z-10 py-20 px-8 flex flex-col items-center justify-center text-center">
+          {/* Icon - Centered */}
+          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#5227FF]/20 to-[#7C4DFF]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+            <svg className="w-12 h-12 text-[#5227FF]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+            </svg>
           </div>
-        </div>
 
-        <div className="rounded-xl border border-gray-800 bg-gray-900 p-6">
-          <h3 className="text-lg font-semibold mb-4">Distribution</h3>
-          <div className="flex flex-col gap-3">
-            {["Spotify", "Apple Music", "YouTube Music", "Tidal"].map((platform) => (
-              <label key={platform} className="flex items-center justify-between cursor-pointer">
-                <span className="text-sm">{platform}</span>
-                <div className="w-10 h-5 bg-[#5227FF] rounded-full relative">
-                  <div className="absolute right-0.5 top-0.5 w-4 h-4 bg-white rounded-full" />
-                </div>
-              </label>
-            ))}
-          </div>
+          <h2 className="text-3xl font-bold mb-2">Drop your audio files here</h2>
+          <p className="text-base text-muted-foreground mb-8">
+            or click to browse · MP3, WAV, FLAC, AAC · Up to 500MB per file
+          </p>
+
+          <button className="relative px-8 py-3.5 bg-gradient-to-r from-[#5227FF] to-[#7C4DFF] rounded-full text-white font-medium text-sm hover:from-[#6B3FFF] hover:to-[#9060FF] transition-all duration-300 hover:shadow-lg hover:shadow-[#5227FF]/30">
+            Browse Files
+          </button>
         </div>
       </div>
 
-      <div className="mt-8 flex justify-end">
-        <button className="rounded-full bg-[#5227FF] px-8 py-3 text-sm font-medium hover:bg-[#6B3FFF] transition-colors">
-          Submit Release
-        </button>
+      {/* Footer Info */}
+      <div className="mt-16 text-center text-sm text-muted-foreground max-w-xl">
+        <p>Multiple uploads supported · Drag & drop or click to select files</p>
       </div>
     </div>
   );
