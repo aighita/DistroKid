@@ -8,45 +8,45 @@ using DistroKid.Services.Authorization;
 using DistroKid.Services.DataTransferObjects;
 using DistroKid.Services.Implementations;
 
-
 namespace DistroKid.Api.Controllers;
+
 
 [ApiController]
 [Route("api/[controller]/[action]")]
-public class ReleaseController(ILogger<ReleaseController> logger, IUserService userService, IReleaseService releaseService) : AuthorizedController(logger, userService)
+public class LabelController(ILogger<LabelController> logger, IUserService userService, ILabelService labelService) : AuthorizedController(logger, userService)
 {
-    protected readonly IReleaseService ReleaseService = releaseService;
+    protected readonly ILabelService LabelService = labelService;
 
     [Authorize]
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<RequestResponse<ReleaseRecord>>> GetById([FromRoute] Guid id)
+    public async Task<ActionResult<RequestResponse<LabelRecord>>> GetById([FromRoute] Guid id)
     {
         var currentUser = await GetCurrentUser();
 
         return currentUser.Result != null ?
-            FromServiceResponse(await ReleaseService.GetReleaseById(id)) :
-            ErrorMessageResult<ReleaseRecord>(currentUser.Error);
+            FromServiceResponse(await LabelService.GetLabelById(id)) :
+            ErrorMessageResult<LabelRecord>(currentUser.Error);
     }
 
     [Authorize]
     [HttpPost]
-    public async Task<ActionResult<RequestResponse>> Add([FromBody] ReleaseAddRecord release)
+    public async Task<ActionResult<RequestResponse>> Add([FromBody] LabelAddRecord label)
     {
         var currentUser = await GetCurrentUser();
 
         return currentUser.Result != null ?
-            FromServiceResponse(await ReleaseService.AddRelease(release, currentUser.Result)) :
+            FromServiceResponse(await LabelService.AddLabel(label, currentUser.Result)) :
             ErrorMessageResult(currentUser.Error);
     }
 
     [Authorize]
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<RequestResponse>> Update([FromRoute] Guid id, [FromBody] ReleaseUpdateRecord release)
+    public async Task<ActionResult<RequestResponse>> Update([FromRoute] Guid id, [FromBody] LabelUpdateRecord label)
     {
         var currentUser = await GetCurrentUser();
 
         return currentUser.Result != null ?
-            FromServiceResponse(await ReleaseService.UpdateRelease(id, release, currentUser.Result)) :
+            FromServiceResponse(await LabelService.UpdateLabel(id, label, currentUser.Result)) :
             ErrorMessageResult(currentUser.Error);
     }
 
@@ -57,7 +57,7 @@ public class ReleaseController(ILogger<ReleaseController> logger, IUserService u
         var currentUser = await GetCurrentUser();
 
         return currentUser.Result != null ?
-            FromServiceResponse(await ReleaseService.DeleteRelease(id, currentUser.Result)) :
+            FromServiceResponse(await LabelService.DeleteLabel(id, currentUser.Result)) :
             ErrorMessageResult(currentUser.Error);
     }
 }

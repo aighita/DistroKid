@@ -8,45 +8,45 @@ using DistroKid.Services.Authorization;
 using DistroKid.Services.DataTransferObjects;
 using DistroKid.Services.Implementations;
 
-
 namespace DistroKid.Api.Controllers;
+
 
 [ApiController]
 [Route("api/[controller]/[action]")]
-public class ReleaseController(ILogger<ReleaseController> logger, IUserService userService, IReleaseService releaseService) : AuthorizedController(logger, userService)
+public class MerchController(ILogger<MerchController> logger, IUserService userService, IMerchService MerchService) : AuthorizedController(logger, userService)
 {
-    protected readonly IReleaseService ReleaseService = releaseService;
+    protected readonly IMerchService MerchService = MerchService;
 
     [Authorize]
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<RequestResponse<ReleaseRecord>>> GetById([FromRoute] Guid id)
+    public async Task<ActionResult<RequestResponse<MerchRecord>>> GetById([FromRoute] Guid id)
     {
         var currentUser = await GetCurrentUser();
 
         return currentUser.Result != null ?
-            FromServiceResponse(await ReleaseService.GetReleaseById(id)) :
-            ErrorMessageResult<ReleaseRecord>(currentUser.Error);
+            FromServiceResponse(await MerchService.GetMerchById(id)) :
+            ErrorMessageResult<MerchRecord>(currentUser.Error);
     }
 
     [Authorize]
     [HttpPost]
-    public async Task<ActionResult<RequestResponse>> Add([FromBody] ReleaseAddRecord release)
+    public async Task<ActionResult<RequestResponse>> Add([FromBody] MerchAddRecord Merch)
     {
         var currentUser = await GetCurrentUser();
 
         return currentUser.Result != null ?
-            FromServiceResponse(await ReleaseService.AddRelease(release, currentUser.Result)) :
+            FromServiceResponse(await MerchService.AddMerch(Merch, currentUser.Result)) :
             ErrorMessageResult(currentUser.Error);
     }
 
     [Authorize]
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<RequestResponse>> Update([FromRoute] Guid id, [FromBody] ReleaseUpdateRecord release)
+    public async Task<ActionResult<RequestResponse>> Update([FromRoute] Guid id, [FromBody] MerchUpdateRecord Merch)
     {
         var currentUser = await GetCurrentUser();
 
         return currentUser.Result != null ?
-            FromServiceResponse(await ReleaseService.UpdateRelease(id, release, currentUser.Result)) :
+            FromServiceResponse(await MerchService.UpdateMerch(id, Merch, currentUser.Result)) :
             ErrorMessageResult(currentUser.Error);
     }
 
@@ -57,7 +57,7 @@ public class ReleaseController(ILogger<ReleaseController> logger, IUserService u
         var currentUser = await GetCurrentUser();
 
         return currentUser.Result != null ?
-            FromServiceResponse(await ReleaseService.DeleteRelease(id, currentUser.Result)) :
+            FromServiceResponse(await MerchService.DeleteMerch(id, currentUser.Result)) :
             ErrorMessageResult(currentUser.Error);
     }
 }
