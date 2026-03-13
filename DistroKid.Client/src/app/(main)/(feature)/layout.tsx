@@ -1,24 +1,6 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-
 import ClickSpark from "@/components/ClickSpark";
 import StaggeredMenu from "@/components/StaggeredMenu";
 import GradientText from "@/components/GradientText";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "DistroKid",
-  description: "Easy way to manage music",
-};
 
 const menuItems = [
   { label: 'RELEASEs', ariaLabel: 'View your releases', link: '/releases' },
@@ -33,55 +15,49 @@ const socialItems = [
   { label: 'Facebook', link: 'https://facebook.com' }
 ];
 
-export default function RootLayout({
+export default function FeatureLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background`}
-      >
-        <ClickSpark
-          sparkColor='#5227FF'
-          sparkSize={10}
-          sparkRadius={15}
-          sparkCount={8}
-          duration={400}
-        >
-          <StaggeredMenu
-            position="right"
-            logoUrl="/"
-            logo={<GradientText
-                    colors={["#5227FF","#7C4DFF","#B19EEF"]}
-                    animationSpeed={4}
-                    showBorder={false}
-                    className="custom-class"
-                  >
-                    DistroKid
-                  </GradientText>}
-            items={menuItems}
-            socialItems={socialItems}
-            displaySocials
-            displayItemNumbering={false}
-            menuButtonColor="#000000"
-            openMenuButtonColor="#111111"
-            changeMenuColorOnOpen={true}
-            colors={['#5227FF', '#7C4DFF']}
-            accentColor="#5227FF"
-            isFixed={true}
-            workingHours={[
-              { day: 'Total Streams', hours: '2.4M' },
-              { day: 'Followers', hours: '18.5K' },
-              { day: 'Top Track', hours: '642K plays' }
-            ]}
-          />
-          <main>
-            {children}
-          </main>
-        </ClickSpark>
-      </body>
-    </html>
+    <ClickSpark
+      sparkColor='#5227FF'
+      sparkSize={10}
+      sparkRadius={15}
+      sparkCount={8}
+      duration={400}
+    >
+      <StaggeredMenu
+        position="right"
+        logoUrl="/"
+        logo={<GradientText
+                colors={["#5227FF","#7C4DFF","#B19EEF"]}
+                animationSpeed={4}
+                showBorder={false}
+                className="custom-class"
+              >
+                DistroKid
+              </GradientText>}
+        items={menuItems}
+        socialItems={socialItems}
+        displaySocials
+        displayItemNumbering={false}
+        menuButtonColor="#000000"
+        openMenuButtonColor="#111111"
+        changeMenuColorOnOpen={true}
+        colors={['#5227FF', '#7C4DFF']}
+        accentColor="#5227FF"
+        isFixed={true}
+        workingHours={[
+          { day: 'Total Streams', hours: '2.4M' },
+          { day: 'Followers', hours: '18.5K' },
+          { day: 'Top Track', hours: '642K plays' }
+        ]}
+      />
+      <main>
+        {children}
+      </main>
+    </ClickSpark>
   );
 }

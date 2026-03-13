@@ -1,12 +1,12 @@
-using DistroKid.Infrastructure.BaseObjects;
+namespace DistroKid.Services.DataTransferObjects;
 
-namespace DistroKid.Database.Repository.Entities;
 
-public class Merch : BaseEntity
+public class MerchRecord
 {
+    public Guid Id { get; set; }
     public string Name { get; set; } = null!;
     public string Description { get; set; } = null!;
     public decimal Price { get; set; }
     public int Stock { get; set; }
-    public User Artist { get; set; } = null!;
+    public Guid ArtistId { get; set; }
 }
