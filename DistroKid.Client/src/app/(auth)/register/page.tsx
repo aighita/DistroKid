@@ -6,6 +6,7 @@ import Stepper, { Step } from "@/components/Stepper";
 import GradientText from "@/components/GradientText";
 
 import { useState } from "react";
+// import { useAuth } from "@/hooks/useAuth";
 
 export default function Register() {
     const [email, setEmail] = useState("");
@@ -16,19 +17,13 @@ export default function Register() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // Here you would typically send a request to your backend to register the user
+        // const { register } = useAuth();
+        
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Authorization/Register`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email, password, username, artistName }),
-            });
-            const data = await response.json();
-            console.log(data);
+            // await register(email, password, username, artistName);
+            // Redirect or show success
         } catch (error) {
-            console.error("Error registering:", error);
+            // Handle error
         }
     };
 

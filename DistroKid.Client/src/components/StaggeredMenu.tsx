@@ -119,7 +119,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
       gsap.set(textInner, { yPercent: 0 });
 
-      if (toggleBtnRef.current) gsap.set(toggleBtnRef.current, { color: menuButtonColor });
+      if (toggleBtnRef.current) gsap.set(toggleBtnRef.current, { color: '#000000' });
     });
     return () => ctx.revert();
   }, [menuButtonColor, position]);
@@ -294,8 +294,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       const btn = toggleBtnRef.current;
       if (!btn) return;
       colorTweenRef.current?.kill();
-      // Manual color flip if blending fails or over white panel
-      const targetColor = opening ? '#000000' : '#ffffff';
+      // Always use black text for white theme
+      const targetColor = '#000000';
       colorTweenRef.current = gsap.to(btn, { color: targetColor, duration: 0.3, ease: 'power2.out' });
     },
     []
@@ -303,7 +303,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
   React.useEffect(() => {
     if (toggleBtnRef.current) {
-      gsap.set(toggleBtnRef.current, { color: open ? '#000000' : '#ffffff' });
+      gsap.set(toggleBtnRef.current, { color: '#000000' });
     }
   }, [open]);
 
@@ -443,7 +443,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
           <button
             ref={toggleBtnRef}
-            className={`sm-toggle relative inline-flex items-center gap-[0.3rem] bg-transparent border-0 cursor-pointer font-medium leading-none overflow-visible pointer-events-auto z-50 ${open ? 'text-black' : 'mix-blend-difference text-white'}`}
+            className={`sm-toggle relative inline-flex items-center gap-[0.3rem] bg-transparent border-0 cursor-pointer font-medium leading-none overflow-visible pointer-events-auto z-50 text-black`}
             aria-label={open ? 'Close Menul' : 'Deschide Menul'}
             aria-expanded={open}
             aria-controls="staggered-menu-panel"
