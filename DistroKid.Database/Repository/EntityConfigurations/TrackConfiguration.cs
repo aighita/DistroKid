@@ -22,7 +22,7 @@ public class TrackConfiguration : IEntityTypeConfiguration<Track>
             .IsRequired();
         builder.HasOne(e => e.Artist)
             .WithMany()
-            .HasForeignKey("ArtistId")
+            .HasForeignKey(e => e.ArtistId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

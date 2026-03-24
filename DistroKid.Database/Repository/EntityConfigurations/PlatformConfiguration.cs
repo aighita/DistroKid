@@ -1,10 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using DistroKid.Database.Repository.Entities;
 
 namespace DistroKid.Database.Repository.EntityConfigurations;
-
 
 public class PlatformConfiguration : IEntityTypeConfiguration<Platform>
 {
@@ -19,8 +17,5 @@ public class PlatformConfiguration : IEntityTypeConfiguration<Platform>
         builder.Property(e => e.Url)
             .HasMaxLength(500)
             .IsRequired();
-        builder.HasMany(e => e.Releases)
-            .WithMany(r => r.Platforms)
-            .UsingEntity("PlatformReleases");
     }
 }

@@ -29,6 +29,17 @@ public class TrackController(ILogger<TrackController> logger, IUserService userS
     }
 
     [Authorize]
+    [HttpGet]
+    public async Task<ActionResult<RequestResponse<PagedResponse<TrackRecord>>>> GetPage([FromQuery] PaginationSearchQueryParams pagination)
+    {
+        var currentUser = await GetCurrentUser();
+
+        return currentUser.Result != null ?
+            FromServiceResponse(await TrackService.GetTracks(pagination)) :
+            ErrorMessageResult<PagedResponse<TrackRecord>>(currentUser.Error);
+    }
+
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<RequestResponse>> Add([FromBody] TrackAddRecord track)
     {

@@ -29,6 +29,17 @@ public class EventController(ILogger<EventController> logger, IUserService userS
     }
 
     [Authorize]
+    [HttpGet]
+    public async Task<ActionResult<RequestResponse<PagedResponse<EventRecord>>>> GetPage([FromQuery] PaginationSearchQueryParams pagination)
+    {
+        var currentUser = await GetCurrentUser();
+
+        return currentUser.Result != null ?
+            FromServiceResponse(await EventService.GetEvents(pagination)) :
+            ErrorMessageResult<PagedResponse<EventRecord>>(currentUser.Error);
+    }
+
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<RequestResponse>> Add([FromBody] EventAddRecord Event)
     {

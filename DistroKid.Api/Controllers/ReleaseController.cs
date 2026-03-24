@@ -29,6 +29,17 @@ public class ReleaseController(ILogger<ReleaseController> logger, IUserService u
     }
 
     [Authorize]
+    [HttpGet]
+    public async Task<ActionResult<RequestResponse<PagedResponse<ReleaseRecord>>>> GetPage([FromQuery] PaginationSearchQueryParams pagination)
+    {
+        var currentUser = await GetCurrentUser();
+
+        return currentUser.Result != null ?
+            FromServiceResponse(await ReleaseService.GetReleases(pagination)) :
+            ErrorMessageResult<PagedResponse<ReleaseRecord>>(currentUser.Error);
+    }
+
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<RequestResponse>> Add([FromBody] ReleaseAddRecord release)
     {

@@ -5,6 +5,42 @@
 /// </summary>
 public static class MailTemplates
 {
+    public static string ReleaseAddTemplate(string artistName, string releaseTitle) => $@"<!DOCTYPE html>
+<html lang=""en"" xmlns=""http://www.w3.org/1999/xhtml"">
+<head>
+    <meta charset=""utf-8"" />
+    <title>New Release</title>
+    <style type=""text/css"">
+        p {{ margin: 0 0 5px 0; }}
+    </style>
+</head>
+<body>
+    <table style=""border: none; height: 48px;"" border=""0"" width=""676"" cellspacing=""0"" cellpadding=""10"" align=""center"" bgcolor=""#FFFFFF"">
+        <tbody>
+            <tr>
+                <td style=""background: #ffffff; color: #000000; width: 660px;"" align=""left"" valign=""top"">
+                    <p style=""font-size: 15px; color: #003373; letter-spacing: 0.5px;""><strong>Dear {artistName},</strong></p>
+                </td>
+            </tr>
+            <tr>
+                <td style=""background: #ffffff; color: #000000; width: 660px;"" align=""center"" valign=""top"">
+                    <table style=""border-top: 2px solid #3c87be; width: 660px;"" border=""0"" cellspacing=""0"" cellpadding=""10"">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <p>Your new release <strong>{releaseTitle}</strong> has been successfully published on DistroKid!</p>
+                                    <p style=""margin-top: 10px;"">It is now being distributed to your selected platforms. Thank you for using DistroKid.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>";
+
     public static string UserAddTemplate(string name) => $@"<!DOCTYPE html>
 <html lang=""en"" xmlns=""http://www.w3.org/1999/xhtml"">
 <head>

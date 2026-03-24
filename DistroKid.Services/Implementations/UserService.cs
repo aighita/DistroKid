@@ -64,28 +64,39 @@ public class UserService(IRepository<WebAppDatabaseContext> repository, ILoginSe
         });
     }
 
-    public async Task<ServiceResponse<RegisterResponseRecord>> Register(RegisterRecord register, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse<LoginResponseRecord>> Register(RegisterRecord register, CancellationToken cancellationToken = default)
     {
         var result = await repository.GetAsync(new UserSpec(register.Email), cancellationToken);
 
         if (result != null) // Verify if the user already exists in the database.
         {
-            return ServiceResponse.FromError<RegisterResponseRecord>(new(HttpStatusCode.Conflict, "The user already exists!", ErrorCodes.UserAlreadyExists));
+            return ServiceResponse.FromError<LoginResponseRecord>(new(HttpStatusCode.Conflict, "The user already exists!", ErrorCodes.UserAlreadyExists));
         }
 
-        await repository.AddAsync(new User
+        var newUser = new User
         {
             Email = register.Email,
             Name = register.Name,
             Role = register.Role,
             Password = register.Password
-        }, cancellationToken); // A new entity is created and persisted in the database.
+        };
+
+        await repository.AddAsync(newUser, cancellationToken); // A new entity is created and persisted in the database.
 
         // await mailService.SendMail(register.Email, "Welcome!", MailTemplates.UserAddTemplate(register.Name), true, "My App", cancellationToken); // You can send a notification on the user email. Change the email if you want.
 
-        return ServiceResponse.ForSuccess(new RegisterResponseRecord
+        var user = new UserRecord
         {
-            Message = "User registered successfully!"
+            Id = newUser.Id,
+            Email = newUser.Email,
+            Name = newUser.Name,
+            Role = newUser.Role
+        };
+
+        return ServiceResponse.ForSuccess(new LoginResponseRecord
+        {
+            User = user,
+            Token = loginService.GetToken(user, DateTime.UtcNow, new(7, 0, 0, 0)) // Get a JWT for the user issued now and that expires in 7 days.
         });
     }
 
@@ -149,5 +160,29 @@ public class UserService(IRepository<WebAppDatabaseContext> repository, ILoginSe
         await repository.DeleteAsync<User>(id, cancellationToken); // Delete the entity.
 
         return ServiceResponse.ForSuccess();
+    }
+
+    public async Task<ServiceResponse<List<PlatformRecord>>> GetUserPlatforms(Guid id, UserRecord? requestingUser = null, CancellationToken cancellationToken = default)
+    {
+        if (requestingUser != null && requestingUser.Id != id && requestingUser.Role != UserRoleEnum.Artist) // Verify who can get the platforms, you can change this however you se fit.
+        {
+            return ServiceResponse.FromError<List<PlatformRecord>>(new(HttpStatusCode.Forbidden, "Only artists can have connected platforms!", ErrorCodes.UserNotArtist));
+        }
+
+        var user = await repository.GetAsync(new UserSpec(id), cancellationToken);
+
+        if (user == null || user.Platforms == null || user.Platforms.Count == 0) // Verify if the user has platforms connected.
+        {
+            return ServiceResponse.FromError<List<PlatformRecord>>(CommonErrors.NoPlatformsFound);
+        }
+
+        var platforms = user.Platforms.Select(p => new PlatformRecord
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Url = p.Url
+        }).ToList();
+
+        return ServiceResponse.ForSuccess(platforms);
     }
 }

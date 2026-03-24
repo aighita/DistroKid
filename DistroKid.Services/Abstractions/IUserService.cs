@@ -25,7 +25,7 @@ public interface IUserService
     /// <summary>
     /// Register a new user in the system.
     /// </summary>
-    public Task<ServiceResponse<RegisterResponseRecord>> Register(RegisterRecord register, CancellationToken cancellationToken = default);
+    public Task<ServiceResponse<LoginResponseRecord>> Register(RegisterRecord register, CancellationToken cancellationToken = default);
     /// <summary>
     /// GetUserCount returns the number of users in the database.
     /// </summary>
@@ -45,4 +45,8 @@ public interface IUserService
     /// If the requesting user is null then no verification is performed as it indicates that the application.
     /// </summary>
     public Task<ServiceResponse> DeleteUser(Guid id, UserRecord? requestingUser = null, CancellationToken cancellationToken = default);
+    /// <summary>
+    /// GetUserPlatforms returns the platforms connected to a user.
+    /// </summary>
+    public Task<ServiceResponse<List<PlatformRecord>>> GetUserPlatforms(Guid userId, UserRecord? requestingUser = null, CancellationToken cancellationToken = default);
 }

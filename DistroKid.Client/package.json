@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate:api": "powershell -ExecutionPolicy Bypass -File ./scripts/generate-api.ps1"
   },
   "dependencies": {
     "@react-three/fiber": "^9.5.0",
@@ -16,13 +17,14 @@
     "clsx": "^2.1.1",
     "gsap": "^3.14.2",
     "lucide-react": "^0.576.0",
-    "motion": "^12.35.2",
+    "motion": "^12.36.0",
     "next": "16.1.6",
     "next-themes": "^0.4.6",
     "postprocessing": "^6.38.3",
     "radix-ui": "^1.4.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-use-measure": "^2.1.7",
     "tailwind-merge": "^3.5.0",
     "three": "^0.167.1",
     "zod": "^4.3.6"

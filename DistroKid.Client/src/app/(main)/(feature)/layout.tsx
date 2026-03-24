@@ -1,3 +1,6 @@
+"use client";
+
+import { useRef, useState } from "react";
 import ClickSpark from "@/components/ClickSpark";
 import StaggeredMenu from "@/components/StaggeredMenu";
 import GradientText from "@/components/GradientText";
@@ -5,7 +8,8 @@ import GradientText from "@/components/GradientText";
 const menuItems = [
   { label: 'RELEASEs', ariaLabel: 'View your releases', link: '/releases' },
   { label: 'PLATFORMs', ariaLabel: 'View your platforms', link: '/platforms' },
-  { label: 'MERCH & EVENTs', ariaLabel: 'View your merch and events', link: '/merch-and-events' }
+  { label: 'MERCH & EVENTs', ariaLabel: 'View your merch and events', link: '/merch-and-events' },
+  { label: 'TRACKs', ariaLabel: 'View your tracks', link: '/tracks' }
 ];
 
 const socialItems = [
@@ -20,6 +24,9 @@ export default function FeatureLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const mainRef = useRef<HTMLElement>(null);
+
   return (
     <ClickSpark
       sparkColor='#5227FF'
@@ -29,16 +36,16 @@ export default function FeatureLayout({
       duration={400}
     >
       <StaggeredMenu
-        position="right"
-        logoUrl="/"
-        logo={<GradientText
-                colors={["#5227FF","#7C4DFF","#B19EEF"]}
-                animationSpeed={4}
-                showBorder={false}
-                className="custom-class"
-              >
-                DistroKid
-              </GradientText>}
+        position="left"
+        // logoUrl="/"
+        // logo={<GradientText
+        //         colors={["#5227FF","#7C4DFF","#B19EEF"]}
+        //         animationSpeed={4}
+        //         showBorder={false}
+        //         className="custom-class"
+        //       >
+        //         DistroKid
+        //       </GradientText>}
         items={menuItems}
         socialItems={socialItems}
         displaySocials
@@ -54,8 +61,11 @@ export default function FeatureLayout({
           { day: 'Followers', hours: '18.5K' },
           { day: 'Top Track', hours: '642K plays' }
         ]}
+        onMenuOpen={() => setMenuOpen(true)}
+        onMenuClose={() => setMenuOpen(false)}
+        contentRef={mainRef}
       />
-      <main>
+      <main ref={mainRef}>
         {children}
       </main>
     </ClickSpark>

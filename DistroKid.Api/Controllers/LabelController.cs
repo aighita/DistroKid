@@ -29,6 +29,17 @@ public class LabelController(ILogger<LabelController> logger, IUserService userS
     }
 
     [Authorize]
+    [HttpGet]
+    public async Task<ActionResult<RequestResponse<PagedResponse<LabelRecord>>>> GetPage([FromQuery] PaginationSearchQueryParams pagination)
+    {
+        var currentUser = await GetCurrentUser();
+
+        return currentUser.Result != null ?
+            FromServiceResponse(await LabelService.GetLabels(pagination)) :
+            ErrorMessageResult<PagedResponse<LabelRecord>>(currentUser.Error);
+    }
+
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<RequestResponse>> Add([FromBody] LabelAddRecord label)
     {

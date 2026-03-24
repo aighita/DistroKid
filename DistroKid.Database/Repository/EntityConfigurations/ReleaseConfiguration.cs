@@ -6,7 +6,6 @@ using DistroKid.Database.Repository.Enums;
 
 namespace DistroKid.Database.Repository.EntityConfigurations;
 
-
 public class ReleaseConfiguration : IEntityTypeConfiguration<Release>
 {
     public void Configure(EntityTypeBuilder<Release> builder)
@@ -28,8 +27,12 @@ public class ReleaseConfiguration : IEntityTypeConfiguration<Release>
         builder.HasMany(e => e.Tracks)
             .WithMany(t => t.Releases)
             .UsingEntity("ReleaseTrack");
+        builder.HasOne(e => e.Artist)
+            .WithMany()
+            .HasForeignKey(e => e.ArtistId)
+            .OnDelete(DeleteBehavior.SetNull);
         builder.HasMany(e => e.Platforms)
-            .WithMany(p => p.Releases)
-            .UsingEntity("PlatformReleases");
+            .WithMany()
+            .UsingEntity("ReleasePlatform");
     }
 }

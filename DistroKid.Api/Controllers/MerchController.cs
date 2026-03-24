@@ -29,6 +29,17 @@ public class MerchController(ILogger<MerchController> logger, IUserService userS
     }
 
     [Authorize]
+    [HttpGet]
+    public async Task<ActionResult<RequestResponse<PagedResponse<MerchRecord>>>> GetPage([FromQuery] PaginationSearchQueryParams pagination)
+    {
+        var currentUser = await GetCurrentUser();
+
+        return currentUser.Result != null ?
+            FromServiceResponse(await MerchService.GetMerch(pagination)) :
+            ErrorMessageResult<PagedResponse<MerchRecord>>(currentUser.Error);
+    }
+
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<RequestResponse>> Add([FromBody] MerchAddRecord Merch)
     {

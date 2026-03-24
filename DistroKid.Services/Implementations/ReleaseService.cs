@@ -1,5 +1,7 @@
+using System.Net;
 using DistroKid.Database.Repository;
 using DistroKid.Database.Repository.Entities;
+using DistroKid.Database.Repository.Enums;
 using DistroKid.Infrastructure.Errors;
 using DistroKid.Infrastructure.Repositories.Interfaces;
 using DistroKid.Infrastructure.Requests;
@@ -11,25 +13,188 @@ using DistroKid.Services.Specifications;
 
 namespace DistroKid.Services.Implementations;
 
-public class ReleaseService : IReleaseService
+public class ReleaseService(IRepository<WebAppDatabaseContext> repository, IMailService mailService) : IReleaseService
 {
     public async Task<ServiceResponse<ReleaseRecord>> GetReleaseById(Guid id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var entity = await repository.GetAsync(new ReleaseSpec(id), cancellationToken);
+
+        if (entity == null)
+            return ServiceResponse.FromError<ReleaseRecord>(CommonErrors.ReleaseNotFound);
+
+        return ServiceResponse.ForSuccess(new ReleaseRecord
+        {
+            Id = entity.Id,
+            Title = entity.Title,
+            ReleaseDate = entity.ReleaseDate,
+            Label = entity.Label,
+            ReleaseType = entity.ReleaseType,
+            Tracks = entity.Tracks.Select(t => new TrackRecord
+            {
+                Id = t.Id,
+                Title = t.Title,
+                DurationInSeconds = t.DurationInSeconds,
+                ISRC = t.ISRC,
+                ArtistId = t.ArtistId
+            }).ToList(),
+            Platforms = entity.Platforms.Select(p => new PlatformRecord
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Url = p.Url
+            }).ToList()
+        });
     }
 
-    public Task<ServiceResponse> AddRelease(ReleaseAddRecord Release, UserRecord requestingUser, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse<PagedResponse<ReleaseRecord>>> GetReleases(PaginationSearchQueryParams pagination, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var result = await repository.PageAsync(pagination, new ReleaseProjectionSpec(pagination.Search), cancellationToken);
+        return ServiceResponse.ForSuccess(result);
     }
 
-    public Task<ServiceResponse> UpdateRelease(Guid id, ReleaseUpdateRecord Release, UserRecord requestingUser, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse> AddRelease(ReleaseAddRecord release, UserRecord requestingUser, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        if (requestingUser.Role != UserRoleEnum.Artist && requestingUser.Role != UserRoleEnum.Manager)
+            return ServiceResponse.FromError(new(HttpStatusCode.Forbidden, "Only artists or managers can add releases!", ErrorCodes.CannotAdd));
+
+        Guid artistId;
+        string artistEmail;
+        string artistName;
+
+        if (requestingUser.Role == UserRoleEnum.Artist)
+        {
+            artistId = requestingUser.Id;
+            artistEmail = requestingUser.Email;
+            artistName = requestingUser.Name;
+        }
+        else // Manager must specify which artist the release belongs to
+        {
+            if (release.ArtistId == null)
+                return ServiceResponse.FromError(new(HttpStatusCode.BadRequest, "Managers must specify an ArtistId for the release!", ErrorCodes.CannotAdd));
+
+            var artist = await repository.GetAsync(new UserSpec(release.ArtistId.Value), cancellationToken);
+
+            if (artist == null)
+                return ServiceResponse.FromError(CommonErrors.UserNotFound);
+
+            if (artist.Role != UserRoleEnum.Artist)
+                return ServiceResponse.FromError(CommonErrors.UserNotArtist);
+
+            // Validate that the manager is responsible for this artist (they share a label)
+            var manager = await repository.GetAsync(new UserSpec(requestingUser.Id), cancellationToken);
+
+            if (manager?.ManagerLabelId == null || artist.ArtistLabelId != manager.ManagerLabelId)
+                return ServiceResponse.FromError(new(HttpStatusCode.Forbidden, "Managers can only create releases for artists in their label!", ErrorCodes.CannotAdd));
+
+            artistId = artist.Id;
+            artistEmail = artist.Email;
+            artistName = artist.Name;
+        }
+
+        // Resolve Track entities by the provided IDs
+        var tracks = new List<Track>();
+        foreach (var trackId in release.TrackIds ?? new List<Guid>())
+        {
+            var track = await repository.GetAsync(new TrackSpec(trackId), cancellationToken);
+            if (track != null) tracks.Add(track);
+        }
+
+        // Resolve Platform entities by the provided IDs
+        var platforms = new List<Platform>();
+        foreach (var platformId in release.PlatformIds ?? new List<Guid>())
+        {
+            var platform = await repository.GetAsync(new PlatformSpec(platformId), cancellationToken);
+            if (platform != null) platforms.Add(platform);
+        }
+
+        await repository.AddAsync(new Release
+        {
+            Title = release.Title,
+            ReleaseDate = release.ReleaseDate,
+            Label = release.Label,
+            ReleaseType = release.ReleaseType,
+            ArtistId = artistId,
+            Tracks = tracks,
+            Platforms = platforms
+        }, cancellationToken);
+
+        // Notify the artist by email
+        await mailService.SendMail(
+            artistEmail,
+            "New Release Published!",
+            MailTemplates.ReleaseAddTemplate(artistName, release.Title),
+            true,
+            "DistroKid",
+            cancellationToken);
+
+        return ServiceResponse.ForSuccess();
     }
 
-    public Task<ServiceResponse> DeleteRelease(Guid id, UserRecord requestingUser, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse> UpdateRelease(Guid id, ReleaseUpdateRecord release, UserRecord requestingUser, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        if (requestingUser.Role != UserRoleEnum.Artist && requestingUser.Role != UserRoleEnum.Manager && requestingUser.Role != UserRoleEnum.Admin)
+            return ServiceResponse.FromError(new(HttpStatusCode.Forbidden, "Only artists, managers or admins can update releases!", ErrorCodes.CannotUpdate));
+
+        var entity = await repository.GetAsync(new ReleaseSpec(id), cancellationToken);
+
+        if (entity == null)
+            return ServiceResponse.FromError(CommonErrors.ReleaseNotFound);
+
+        if (requestingUser.Role == UserRoleEnum.Artist && entity.ArtistId.HasValue && entity.ArtistId.Value != requestingUser.Id)
+            return ServiceResponse.FromError(new(HttpStatusCode.Forbidden, "Artists can only update their own releases!", ErrorCodes.CannotUpdate));
+
+        entity.Title = release.Title ?? entity.Title;
+        entity.Label = release.Label ?? entity.Label;
+        if (release.ReleaseType.HasValue) entity.ReleaseType = release.ReleaseType.Value;
+        if (release.ReleaseDate.HasValue) entity.ReleaseDate = release.ReleaseDate.Value;
+
+        if (release.TrackIds != null)
+        {
+            var newTracks = new List<Track>();
+            foreach (var trackId in release.TrackIds)
+            {
+                var track = await repository.GetAsync(new TrackSpec(trackId), cancellationToken);
+                if (track != null) newTracks.Add(track);
+            }
+
+            entity.Tracks.Clear();
+            foreach (var track in newTracks) entity.Tracks.Add(track);
+        }
+
+        if (release.PlatformIds != null)
+        {
+            var newPlatforms = new List<Platform>();
+            foreach (var platformId in release.PlatformIds)
+            {
+                var platform = await repository.GetAsync(new PlatformSpec(platformId), cancellationToken);
+                if (platform != null) newPlatforms.Add(platform);
+            }
+
+            entity.Platforms.Clear();
+            foreach (var platform in newPlatforms) entity.Platforms.Add(platform);
+        }
+
+        entity.UpdateTime();
+        await repository.DbContext.SaveChangesAsync(cancellationToken);
+
+        return ServiceResponse.ForSuccess();
+    }
+
+    public async Task<ServiceResponse> DeleteRelease(Guid id, UserRecord requestingUser, CancellationToken cancellationToken = default)
+    {
+        if (requestingUser.Role != UserRoleEnum.Artist && requestingUser.Role != UserRoleEnum.Manager && requestingUser.Role != UserRoleEnum.Admin)
+            return ServiceResponse.FromError(new(HttpStatusCode.Forbidden, "Only artists, managers or admins can delete releases!", ErrorCodes.CannotDelete));
+
+        var entity = await repository.GetAsync(new ReleaseSpec(id), cancellationToken);
+
+        if (entity == null)
+            return ServiceResponse.FromError(CommonErrors.ReleaseNotFound);
+
+        if (requestingUser.Role == UserRoleEnum.Artist && entity.ArtistId.HasValue && entity.ArtistId.Value != requestingUser.Id)
+            return ServiceResponse.FromError(new(HttpStatusCode.Forbidden, "Artists can only delete their own releases!", ErrorCodes.CannotDelete));
+
+        await repository.DeleteAsync<Release>(id, cancellationToken);
+
+        return ServiceResponse.ForSuccess();
     }
 }

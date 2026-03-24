@@ -25,7 +25,7 @@ public class MerchConfiguration : IEntityTypeConfiguration<Merch>
             .IsRequired();
         builder.HasOne(e => e.Artist)
             .WithMany()
-            .HasForeignKey("ArtistId")
+            .HasForeignKey(e => e.ArtistId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

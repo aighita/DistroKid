@@ -3,6 +3,7 @@
 import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 // import Image from 'next/image';
 
 import {
@@ -41,6 +42,7 @@ export interface StaggeredMenuProps {
   isFixed: boolean;
   changeMenuColorOnOpen?: boolean;
   closeOnClickAway?: boolean;
+  contentRef?: React.RefObject<HTMLElement | null>;
   onMenuOpen?: () => void;
   onMenuClose?: () => void;
 }
@@ -63,11 +65,14 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   closeOnClickAway = true,
   workingHours = [],
   contactInfo = [],
+  contentRef,
   onMenuOpen,
   onMenuClose
 }: StaggeredMenuProps) => {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const openRef = useRef(false);
+  const pendingNavRef = useRef<string | null>(null);
 
   const panelRef = useRef<HTMLDivElement | null>(null);
   const preLayersRef = useRef<HTMLDivElement | null>(null);
@@ -89,6 +94,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
   const toggleBtnRef = useRef<HTMLButtonElement | null>(null);
   const busyRef = useRef(false);
+  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const itemEntranceTweenRef = useRef<gsap.core.Tween | null>(null);
 
@@ -153,6 +159,16 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
     const tl = gsap.timeline({ paused: true });
 
+    // Animate main content margin starting at the same time as the first pre-layer
+    if (contentRef?.current) {
+      const marginProp = position === 'right' ? 'marginRight' : 'marginLeft';
+      tl.to(contentRef.current, {
+        [marginProp]: 'clamp(260px, 38vw, 420px)',
+        duration: 0.6,
+        ease: 'power4.out',
+      }, 0);
+    }
+
     layerStates.forEach((ls, i) => {
       tl.fromTo(ls.el, { xPercent: ls.start }, { xPercent: 0, duration: 0.5, ease: 'power4.out' }, i * 0.07);
     });
@@ -211,7 +227,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
     openTlRef.current = tl;
     return tl;
-  }, [position]);
+  }, [position, contentRef]);
 
   const playOpen = useCallback(() => {
     if (busyRef.current) return;
@@ -228,9 +244,22 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   }, [buildOpenTimeline]);
 
   const playClose = useCallback(() => {
+    // Capture current margin before killing the open timeline
+    let currentMargin = '0px';
+    if (contentRef?.current) {
+      const marginProp = position === 'right' ? 'marginRight' : 'marginLeft';
+      currentMargin = getComputedStyle(contentRef.current)[marginProp as any] || '0px';
+    }
+
     openTlRef.current?.kill();
     openTlRef.current = null;
     itemEntranceTweenRef.current?.kill();
+
+    // Re-apply captured margin so it doesn't snap after timeline kill
+    if (contentRef?.current) {
+      const marginProp = position === 'right' ? 'marginRight' : 'marginLeft';
+      gsap.set(contentRef.current, { [marginProp]: currentMargin });
+    }
 
     const panel = panelRef.current;
     const layers = preLayerElsRef.current;
@@ -246,6 +275,17 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       duration: 0.32,
       ease: 'power3.in',
       overwrite: 'auto',
+      onStart: () => {
+        // Animate content margin back to 0 in sync with close
+        if (contentRef?.current) {
+          const marginProp = position === 'right' ? 'marginRight' : 'marginLeft';
+          gsap.to(contentRef.current, {
+            [marginProp]: 0,
+            duration: 0.32,
+            ease: 'power3.in',
+          });
+        }
+      },
       onComplete: () => {
         const itemEls = Array.from(panel.querySelectorAll('.sm-panel-itemLabel')) as HTMLElement[];
         if (itemEls.length) gsap.set(itemEls, { yPercent: 140, rotate: 10 });
@@ -257,13 +297,19 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
         const socialTitle = panel.querySelector('.sm-socials-title') as HTMLElement | null;
         const socialLinks = Array.from(panel.querySelectorAll('.sm-socials-link')) as HTMLElement[];
+
+        if (pendingNavRef.current) {
+          const href = pendingNavRef.current;
+          pendingNavRef.current = null;
+          router.push(href);
+        }
         if (socialTitle) gsap.set(socialTitle, { opacity: 0 });
         if (socialLinks.length) gsap.set(socialLinks, { y: 25, opacity: 0 });
 
         busyRef.current = false;
       }
     });
-  }, [position]);
+  }, [position, contentRef, router]);
 
   const animateIcon = useCallback((opening: boolean) => {
     const icon = iconRef.current;
@@ -356,6 +402,18 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     animateText(target);
   }, [playOpen, playClose, animateIcon, animateColor, animateText, onMenuOpen, onMenuClose]);
 
+  const openMenu = useCallback(() => {
+    if (!openRef.current) {
+      openRef.current = true;
+      setOpen(true);
+      onMenuOpen?.();
+      playOpen();
+      animateIcon(true);
+      animateColor(true);
+      animateText(true);
+    }
+  }, [playOpen, animateIcon, animateColor, animateText, onMenuOpen]);
+
   const closeMenu = useCallback(() => {
     if (openRef.current) {
       openRef.current = false;
@@ -367,6 +425,35 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       animateText(false);
     }
   }, [playClose, animateIcon, animateColor, animateText, onMenuClose]);
+
+  const cancelHoverClose = useCallback(() => {
+    if (hoverTimerRef.current !== null) {
+      clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+  }, []);
+
+  const scheduleHoverClose = useCallback(() => {
+    cancelHoverClose();
+    hoverTimerRef.current = setTimeout(() => {
+      closeMenu();
+    }, 120);
+  }, [closeMenu, cancelHoverClose]);
+
+  const navigateWithClose = useCallback((href: string) => {
+    if (openRef.current) {
+      pendingNavRef.current = href;
+      openRef.current = false;
+      setOpen(false);
+      onMenuClose?.();
+      playClose();
+      animateIcon(false);
+      animateColor(false);
+      animateText(false);
+    } else {
+      router.push(href);
+    }
+  }, [router, playClose, animateIcon, animateColor, animateText, onMenuClose]);
 
   React.useEffect(() => {
     if (!closeOnClickAway || !open) return;
@@ -426,21 +513,6 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
           className="staggered-menu-header absolute top-0 left-0 w-full flex items-center justify-between p-[2em] bg-transparent pointer-events-none z-20"
           aria-label="Main navigation header"
         >
-          {(logo || logoUrl) && (
-            <Link href="/" className="sm-logo flex items-center select-none pointer-events-auto cursor-pointer z-50 mix-blend-screen" aria-label="Go to Home">
-              {logo ? (
-                logo
-              ) : (
-                <img
-                  src={logoUrl || ""}
-                  alt="Logo"
-                  className="sm-logo-img block h-10 w-auto object-contain invert brightness-125"
-                  draggable={false}
-                />
-              )}
-            </Link>
-          )}
-
           <button
             ref={toggleBtnRef}
             className={`sm-toggle relative inline-flex items-center gap-[0.3rem] bg-transparent border-0 cursor-pointer font-medium leading-none overflow-visible pointer-events-auto z-50 text-black`}
@@ -448,6 +520,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
             aria-expanded={open}
             aria-controls="staggered-menu-panel"
             onClick={toggleMenu}
+            onMouseEnter={() => { cancelHoverClose(); openMenu(); }}
+            onMouseLeave={scheduleHoverClose}
             type="button"
           >
             <span
@@ -479,6 +553,21 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
               />
             </span>
           </button>
+
+          {(logo || logoUrl) && (
+            <Link href="/" className="sm-logo flex items-center select-none pointer-events-auto cursor-pointer z-50 mix-blend-screen" aria-label="Go to Home">
+              {logo ? (
+                logo
+              ) : (
+                <img
+                  src={logoUrl || ""}
+                  alt="Logo"
+                  className="sm-logo-img block h-10 w-auto object-contain invert brightness-125"
+                  draggable={false}
+                />
+              )}
+            </Link>
+          )}
         </header>
 
         <aside
@@ -486,6 +575,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
           ref={panelRef}
           className="staggered-menu-panel absolute top-0 right-0 h-full bg-white flex flex-col p-[6em_2em_2em_2em] overflow-y-auto z-10 pointer-events-auto"
           aria-hidden={!open}
+          onMouseEnter={cancelHoverClose}
+          onMouseLeave={scheduleHoverClose}
         >
           <div className="sm-panel-inner flex-1 flex flex-col gap-5">
             <ul
@@ -496,6 +587,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
               <li className="pl-4 pb-4 sm-panel-itemWrap relative overflow-hidden leading-none border-b border-black/10">
                 <a
                   href="/"
+                  onClick={(e) => { e.preventDefault(); navigateWithClose('/'); }}
                   className="sm-panel-item sm-panel-profile relative text-black font-semibold text-lg cursor-pointer leading-tight transition-[background,color] duration-150 ease-linear inline-block no-underline pr-[1.4em]"
 
                 >
@@ -523,6 +615,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                     <a
                       className="sm-panel-item relative text-black font-semibold text-[4rem] cursor-pointer leading-none tracking-[-2px] transition-[background,color] duration-150 ease-linear inline-block no-underline pr-[1.4em]"
                       href={it.link}
+                      onClick={(e) => { e.preventDefault(); navigateWithClose(it.link); }}
                       aria-label={it.ariaLabel}
                       data-index={idx + 1}
                     >
@@ -545,13 +638,15 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
             <div className="sm-secondary-links mt-4 flex flex-col gap-3">
               <a
-                href="/upload-music"
+                href="/upload"
+                onClick={(e) => { e.preventDefault(); navigateWithClose('/upload'); }}
                 className="text-xs font-black tracking-[0.2em] text-zinc-500 hover:text-[#0088FF] transition-colors"
               >
                 Upload Music
               </a>
               <a
                 href="/analytics"
+                onClick={(e) => { e.preventDefault(); navigateWithClose('/analytics'); }}
                 className="text-xs font-black tracking-[0.2em] text-zinc-500 hover:text-[#0088FF] transition-colors"
               >
                 Analytics
@@ -604,7 +699,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 .sm-scope .staggered-menu-header > * { pointer-events: auto; }
 .sm-scope .sm-logo { display: flex; align-items: center; user-select: none; }
 .sm-scope .sm-logo-img { display: block; height: 32px; width: auto; object-fit: contain; }
-.sm-scope .sm-toggle { position: relative; display: inline-flex; align-items: center; gap: 0.3rem; background: transparent; border: none; cursor: pointer; color: white; font-weight: 500; line-height: 1; overflow: visible; }
+.sm-scope .sm-toggle { position: relative; display: inline-flex; align-items: center; gap: 0.3rem; background: transparent; border: none; cursor: pointer; color: black; font-weight: 500; line-height: 1; overflow: visible; }
 .sm-scope .sm-toggle:focus-visible { outline: 2px solid #ffffffaa; outline-offset: 4px; border-radius: 4px; }
 .sm-scope .sm-line:last-of-type { margin-top: 6px; }
 .sm-scope .sm-toggle-textWrap { position: relative; margin-right: 0.5em; display: inline-block; height: 1em; overflow: hidden; white-space: nowrap; width: var(--sm-toggle-width, auto); min-width: var(--sm-toggle-width, auto); }

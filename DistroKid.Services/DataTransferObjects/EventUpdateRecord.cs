@@ -1,11 +1,10 @@
 namespace DistroKid.Services.DataTransferObjects;
 
-
 public class EventUpdateRecord
 {
-    public string? Name { get; set; } = null!;
-    public string? Description { get; set; } = null!;
-    public string? Location { get; set; } = null!;
+    public string? Name { get; set; }
+    public string? Description { get; set; }
+    public string? Location { get; set; }
     public DateTime? Date { get; set; }
-    public UserRecord? Artist { get; set; } = null!;
+    // Artist ownership cannot be changed after creation.
 }

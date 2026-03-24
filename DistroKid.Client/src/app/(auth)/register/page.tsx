@@ -2,174 +2,99 @@
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Stepper, { Step } from "@/components/Stepper";
 import GradientText from "@/components/GradientText";
+import Link from "next/link";
+import { useRegisterForm } from "@/hooks/useRegisterForm";
 
-import { useState } from "react";
-// import { useAuth } from "@/hooks/useAuth";
-
-export default function Register() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [username, setUsername] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [artistName, setArtistName] = useState("");
-
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        // const { register } = useAuth();
-        
-        try {
-            // await register(email, password, username, artistName);
-            // Redirect or show success
-        } catch (error) {
-            // Handle error
-        }
-    };
+export default function RegisterPage() {
+    const { formData, handleChange, error, isLoading, handleSubmit } = useRegisterForm();
 
     return (
-        <div className="flex flex-col w-full h-full gap-2 p-6 items-center justify-center">
-            <div className="flex flex-col items-center gap-2 text-center">
-                <GradientText
-                    colors={["#5227FF","#FF9FFC","#B19EEF"]}
-                    animationSpeed={25}
-                    showBorder={false}
-                    className="text-6xl font-bold"
-                >
-                    DistroKid
-                </GradientText>
-                <p className="text-neutral-500">Join the music revolution</p>
-            </div>
-            <form onSubmit={handleSubmit} className="w-full">
-                <Stepper
-                    initialStep={1}
-                    backButtonText="Back"
-                    nextButtonText="Next"
-                    stepContainerClassName="w-full"
-                    contentClassName=""
-                    containerClassName="w-full"
-                    showBorder={false}
+        <div className="min-h-screen w-full bg-white flex flex-col items-center justify-center gap-6 px-4">
+            <GradientText
+                colors={["#5227FF","#FF9FFC","#B19EEF"]}
+                animationSpeed={25}
+                showBorder={false}
+                className="text-6xl font-bold"
+            >
+                DistroKid
+            </GradientText>
+            <div className="flex w-full max-w-sm flex-col items-center gap-y-4 rounded-md bg-white border border-gray-200 px-6 py-8 shadow-sm">
+                <h1 className="text-xl font-semibold text-gray-900">Join DistroKid</h1>
+                <p className="text-sm text-gray-600">Create your account to get started</p>
+                
+                {error && (
+                    <div className="w-full bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded text-sm">
+                        {error}
+                    </div>
+                )}
+                
+                <form onSubmit={handleSubmit} className="w-full space-y-3">
+                    <Input
+                        type="text"
+                        name="name"
+                        placeholder="Full Name"
+                        className="text-sm"
+                        required
+                        value={formData.name}
+                        onChange={handleChange}
+                        disabled={isLoading}
+                    />
+                    <Input
+                        type="email"
+                        name="email"
+                        placeholder="Email"
+                        className="text-sm"
+                        required
+                        value={formData.email}
+                        onChange={handleChange}
+                        disabled={isLoading}
+                    />
+                    <select
+                        name="role"
+                        value={formData.role}
+                        onChange={handleChange}
+                        disabled={isLoading}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm text-gray-900"
                     >
-                    <Step>
-                        <div className="space-y-4">
-                            <h2 className="text-2xl font-semibold">Create Your Account</h2>
-                            <p className="text-neutral-500 mb-6">Let's get started with your DistroKid profile</p>
-                            <div className="space-y-3">
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">Email</label>
-                                    <Input
-                                        type="email"
-                                        placeholder="your@email.com"
-                                        className="w-full"
-                                        required
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">Username</label>
-                                    <Input
-                                        type="text"
-                                        placeholder="Choose a username"
-                                        className="w-full"
-                                        required
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </Step>
-                    
-                    <Step>
-                        <div className="space-y-4">
-                            <h2 className="text-2xl font-semibold">Secure Your Account</h2>
-                            <p className="text-neutral-500 mb-6">Create a strong password</p>
-                            <div className="space-y-3">
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">Password</label>
-                                    <Input
-                                        type="password"
-                                        placeholder="Enter password"
-                                        className="w-full"
-                                        required
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">Confirm Password</label>
-                                    <Input
-                                        type="password"
-                                        placeholder="Confirm password"
-                                        className="w-full"
-                                        required
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </Step>
-                    
-                    <Step>
-                        <div className="space-y-4">
-                            <h2 className="text-2xl font-semibold">Artist Profile</h2>
-                            <p className="text-neutral-500 mb-6">Tell us about your music</p>
-                            <div className="space-y-3">
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">Artist Name</label>
-                                    <Input
-                                        type="text"
-                                        placeholder="Your artist name"
-                                        className="w-full"
-                                        required
-                                        value={artistName}
-                                        onChange={(e) => setArtistName(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </Step>
-                    
-                    <Step>
-                        <div className="space-y-4">
-                            <h2 className="text-2xl font-semibold">Confirm & Complete</h2>
-                            <p className="text-neutral-500 mb-6">Review your information before completing registration</p>
-                            <div className="bg-neutral-900 rounded p-4 space-y-2">
-                                <div className="flex justify-between">
-                                    <span className="text-neutral-400">Email:</span>
-                                    <span>your@email.com</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-neutral-400">Username:</span>
-                                    <span>username</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-neutral-400">Artist Name:</span>
-                                    <span>Your Artist Name</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-neutral-400">Genre:</span>
-                                    <span>Electronic</span>
-                                </div>
-                            </div>
-                            <p className="text-sm text-neutral-500">By clicking Complete, you agree to our Terms of Service</p>
-                        </div>
-                    </Step>
-                </Stepper>
-            </form>
-
-            <div className="flex justify-center items-center gap-1 text-sm text-muted-foreground">
+                        <option value="Artist">Artist</option>
+                        <option value="Manager">Manager</option>
+                    </select>
+                    <Input
+                        type="password"
+                        name="password"
+                        placeholder="Password"
+                        className="text-sm"
+                        required
+                        value={formData.password}
+                        onChange={handleChange}
+                        disabled={isLoading}
+                    />
+                    <Input
+                        type="password"
+                        name="confirmPassword"
+                        placeholder="Confirm Password"
+                        className="text-sm"
+                        required
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        disabled={isLoading}
+                    />
+                    <Button 
+                        type="submit" 
+                        className="w-full"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? "Registering..." : "Register"}
+                    </Button>
+                </form>
+            </div>
+            <div className="flex justify-center items-center gap-1 text-sm text-gray-600">
                 <p>Already have an account?</p>
-                <Button
-                    variant="link"
-                    onClick={() => window.location.href = "/login"}
-                    className="cursor-pointer"
-                >
+                <Link href="/login" className="text-blue-600 hover:underline">
                     Login
-                </Button>
+                </Link>
             </div>
         </div>
-  );
+    );
 }

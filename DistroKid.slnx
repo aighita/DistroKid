@@ -3,4 +3,5 @@
   <Project Path="DistroKid.Database/DistroKid.Database.csproj" />
   <Project Path="DistroKid.Infrastructure/DistroKid.Infrastructure.csproj" />
   <Project Path="DistroKid.Services/DistroKid.Services.csproj" />
+  <Project Path="DistroKid.Fixtures/DistroKid.Fixtures.csproj" />
 </Solution>

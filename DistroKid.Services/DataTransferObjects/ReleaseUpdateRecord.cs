@@ -1,11 +1,18 @@
 
-namespace DistroKid.Services.DataTransferObjects;
+using DistroKid.Database.Repository.Enums;
 
+namespace DistroKid.Services.DataTransferObjects;
 
 public class ReleaseUpdateRecord
 {
-    public string? Title { get; set; } = null!;
-    public string? Label { get; set; } = null!;
-    public List<TrackRecord>? Tracks { get; set; } = null!;
-    public List<PlatformRecord>? Platforms { get; set; } = null!;
+    public string? Title { get; set; }
+    public string? Label { get; set; }
+    public ReleaseTypeEnum? ReleaseType { get; set; }
+    public DateTime? ReleaseDate { get; set; }
+
+    /// <summary>When provided, fully replaces the release's track list.</summary>
+    public List<Guid>? TrackIds { get; set; }
+
+    /// <summary>When provided, fully replaces the release's platform list.</summary>
+    public List<Guid>? PlatformIds { get; set; }
 }

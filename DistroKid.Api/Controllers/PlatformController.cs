@@ -28,6 +28,12 @@ public class PlatformController(ILogger<PlatformController> logger, IUserService
             ErrorMessageResult<PlatformRecord>(currentUser.Error);
     }
 
+    [HttpGet]
+    public async Task<ActionResult<RequestResponse<List<PlatformRecord>>>> GetAll()
+    {
+        return FromServiceResponse(await PlatformService.GetAllPlatforms());
+    }
+
     [Authorize]
     [HttpPost]
     public async Task<ActionResult<RequestResponse>> Add([FromBody] PlatformAddRecord Platform)

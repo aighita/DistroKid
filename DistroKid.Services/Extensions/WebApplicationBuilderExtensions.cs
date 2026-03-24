@@ -44,7 +44,13 @@ public static class WebApplicationBuilderExtensions
             .AddScoped<ILoginService, LoginService>()
             .AddScoped<IFileRepository, FileRepository>()
             .AddScoped<IUserFileService, UserFileService>()
-            .AddScoped<IMailService, MailService>();
+            .AddScoped<IMailService, MailService>()
+            .AddScoped<IPlatformService, PlatformService>()
+            .AddScoped<ITrackService, TrackService>()
+            .AddScoped<IReleaseService, ReleaseService>()
+            .AddScoped<ILabelService, LabelService>()
+            .AddScoped<IEventService, EventService>()
+            .AddScoped<IMerchService, MerchService>();
 
         return builder;
     }

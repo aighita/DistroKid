@@ -166,6 +166,9 @@ namespace DistroKid.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("ArtistId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -193,6 +196,8 @@ namespace DistroKid.Database.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ArtistId");
 
                     b.HasIndex("LabelId");
 
@@ -319,19 +324,19 @@ namespace DistroKid.Database.Migrations
                     b.ToTable("UserFile");
                 });
 
-            modelBuilder.Entity("PlatformReleases", b =>
+            modelBuilder.Entity("ReleasePlatform", b =>
                 {
                     b.Property<Guid>("PlatformsId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ReleasesId")
+                    b.Property<Guid>("ReleaseId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("PlatformsId", "ReleasesId");
+                    b.HasKey("PlatformsId", "ReleaseId");
 
-                    b.HasIndex("ReleasesId");
+                    b.HasIndex("ReleaseId");
 
-                    b.ToTable("PlatformReleases");
+                    b.ToTable("ReleasePlatform");
                 });
 
             modelBuilder.Entity("ReleaseTrack", b =>
@@ -380,10 +385,17 @@ namespace DistroKid.Database.Migrations
 
             modelBuilder.Entity("DistroKid.Database.Repository.Entities.Release", b =>
                 {
+                    b.HasOne("DistroKid.Database.Repository.Entities.User", "Artist")
+                        .WithMany()
+                        .HasForeignKey("ArtistId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("DistroKid.Database.Repository.Entities.Label", null)
                         .WithMany("Releases")
                         .HasForeignKey("LabelId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Artist");
                 });
 
             modelBuilder.Entity("DistroKid.Database.Repository.Entities.Track", b =>
@@ -421,7 +433,7 @@ namespace DistroKid.Database.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("PlatformReleases", b =>
+            modelBuilder.Entity("ReleasePlatform", b =>
                 {
                     b.HasOne("DistroKid.Database.Repository.Entities.Platform", null)
                         .WithMany()
@@ -431,7 +443,7 @@ namespace DistroKid.Database.Migrations
 
                     b.HasOne("DistroKid.Database.Repository.Entities.Release", null)
                         .WithMany()
-                        .HasForeignKey("ReleasesId")
+                        .HasForeignKey("ReleaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

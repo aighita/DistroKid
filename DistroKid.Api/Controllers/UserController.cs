@@ -48,6 +48,17 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
             ErrorMessageResult<PagedResponse<UserRecord>>(currentUser.Error);
     }
 
+    [Authorize]
+    [HttpGet]
+    public async Task<ActionResult<RequestResponse<List<PlatformRecord>>>> GetUserPlatforms()
+    {
+        var currentUser = await GetCurrentUser();
+
+        return currentUser.Result != null ?
+            FromServiceResponse(await UserService.GetUserPlatforms(currentUser.Result.Id, currentUser.Result)) :
+            ErrorMessageResult<List<PlatformRecord>>(currentUser.Error);
+    }
+
     /// <summary>
     /// This method implements the Create operation (C from CRUD) of a user. 
     /// </summary>

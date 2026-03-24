@@ -1,75 +1,68 @@
-const platforms = [
-  { name: "Spotify", connected: true, streams: "1.2M", color: "#1DB954", icon: "🟢" },
-  { name: "Apple Music", connected: true, streams: "680K", color: "#FA243C", icon: "🔴" },
-  { name: "YouTube Music", connected: true, streams: "340K", color: "#FF0000", icon: "🔴" },
-  { name: "Tidal", connected: true, streams: "180K", color: "#00FFFF", icon: "🔵" },
-  { name: "Amazon Music", connected: false, streams: "—", color: "#FF9900", icon: "🟠" },
-  { name: "Deezer", connected: false, streams: "—", color: "#A238FF", icon: "🟣" },
-  { name: "SoundCloud", connected: false, streams: "—", color: "#FF5500", icon: "🟠" },
-  { name: "Pandora", connected: false, streams: "—", color: "#224099", icon: "🔵" },
-];
+"use client";
+
+import { usePlatform } from "@/hooks/usePlatform";
+import { useEffect, useState } from "react";
+import { ExternalLink } from "lucide-react";
 
 export default function Platforms() {
+  const { platforms, fetchAllPlatforms } = usePlatform();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadPlatforms = async () => {
+      setIsLoading(true);
+      await fetchAllPlatforms();
+      setIsLoading(false);
+    };
+    loadPlatforms();
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gray-950 text-white px-6 py-12 md:px-16 lg:px-24">
+    <div className="min-h-screen bg-background text-foreground px-6 py-12 md:px-16 lg:px-24">
       {/* Header */}
-      <div className="mb-10">
+      <div className="mb-12">
         <h1 className="text-4xl font-bold tracking-tight">Platforms</h1>
-        <p className="text-gray-400 mt-2">Connect and manage your streaming platforms</p>
+        <p className="text-muted-foreground mt-2">Manage your music distribution across streaming platforms</p>
       </div>
 
-      {/* Connected Platforms */}
-      <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-5 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-green-500" />
-          Connected
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {platforms.filter(p => p.connected).map((platform) => (
-            <div key={platform.name} className="flex items-center justify-between rounded-xl border border-gray-800 bg-gray-900 p-5 hover:border-gray-700 transition-colors">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl" style={{ backgroundColor: platform.color + '20' }}>
-                  {platform.icon}
+      {/* Platforms Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {isLoading ? (
+          <div className="col-span-full flex items-center justify-center py-20">
+            <p className="text-muted-foreground">Loading platforms...</p>
+          </div>
+        ) : platforms.length > 0 ? (
+          platforms.map((platform) => (
+            <a
+              key={platform.id}
+              href={platform.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group rounded-xl border border-border bg-background hover:border-[#5227FF] hover:shadow-lg transition-all duration-300 overflow-hidden"
+            >
+              <div className="p-6 flex flex-col h-full">
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-foreground group-hover:text-[#5227FF] transition-colors">
+                    {platform.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-2 break-all">
+                    {platform.url}
+                  </p>
                 </div>
-                <div>
-                  <h3 className="font-semibold">{platform.name}</h3>
-                  <p className="text-sm text-gray-400">{platform.streams} streams</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-xs px-3 py-1 rounded-full bg-green-900/40 text-green-400">Connected</span>
-                <button className="text-sm text-gray-500 hover:text-red-400 transition-colors">Disconnect</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Available Platforms */}
-      <section>
-        <h2 className="text-xl font-semibold mb-5 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-gray-500" />
-          Available
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {platforms.filter(p => !p.connected).map((platform) => (
-            <div key={platform.name} className="flex items-center justify-between rounded-xl border border-gray-800 bg-gray-900 p-5 hover:border-gray-700 transition-colors">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl opacity-50" style={{ backgroundColor: platform.color + '20' }}>
-                  {platform.icon}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-300">{platform.name}</h3>
-                  <p className="text-sm text-gray-500">Not connected</p>
+                <div className="mt-4 flex items-center gap-2 text-[#5227FF] opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="text-sm font-medium">Visit</span>
+                  <ExternalLink className="w-4 h-4" />
                 </div>
               </div>
-              <button className="rounded-full border border-[#5227FF] text-[#5227FF] px-5 py-1.5 text-sm font-medium hover:bg-[#5227FF] hover:text-white transition-colors">
-                Connect
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
+            </a>
+          ))
+        ) : (
+          <div className="col-span-full flex items-center justify-center py-20">
+            <p className="text-muted-foreground">No platforms available</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
+
