@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { type ColumnDef } from "@tanstack/react-table";
 import { useDataTable, DataTableColumnHeader } from "@/components/data-table1";
@@ -18,6 +18,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { flexRender, getPaginationRowModel } from "@tanstack/react-table";
 import * as React from "react";
 import { useTrack } from "@/hooks/useTrack";
@@ -111,6 +122,7 @@ export default function Tracks() {
 
   const [addOpen, setAddOpen] = React.useState(false);
   const [editItem, setEditItem] = React.useState<TrackRecord | null>(null);
+  const [deleteItem, setDeleteItem] = React.useState<TrackRecord | null>(null);
   const [actionLoading, setActionLoading] = React.useState(false);
   const [searchInput, setSearchInput] = React.useState("");
 
@@ -159,11 +171,7 @@ export default function Tracks() {
                   <Pencil className="w-3.5 h-3.5" />
                 </button>
                 <button
-                  onClick={async () => {
-                    if (!confirm("Delete this track?")) return;
-                    setActionLoading(true);
-                    try { await handleDelete(row.original.id!); } finally { setActionLoading(false); }
-                  }}
+                  onClick={() => setDeleteItem(row.original)}
                   className="p-1.5 rounded-md hover:bg-red-50 transition-colors text-muted-foreground hover:text-red-500"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -304,6 +312,38 @@ export default function Tracks() {
           </DialogContent>
         </Dialog>
       )}
+      {/* Delete dialog */}
+      <AlertDialog open={!!deleteItem} onOpenChange={(o) => !o && setDeleteItem(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the track
+              "{deleteItem?.title}" and remove its data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              disabled={actionLoading}
+              onClick={async (e) => {
+                e.preventDefault();
+                if (!deleteItem) return;
+                setActionLoading(true);
+                try {
+                  await handleDelete(deleteItem.id!);
+                  setDeleteItem(null);
+                } finally {
+                  setActionLoading(false);
+                }
+              }}
+            >
+              {actionLoading ? "Deleting..." : "Delete Track"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

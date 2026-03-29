@@ -1,34 +1,28 @@
 
-# RegisterRecord
+# FeedbackAddRecord
 
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`name` | string
-`email` | string
-`password` | string
-`confirmPassword` | string
-`role` | [UserRoleEnum](UserRoleEnum.md)
-`bio` | string
-`socialMediaLink` | string
+`type` | string
+`rating` | number
+`isAnonymous` | boolean
+`comment` | string
 
 ## Example
 
 ```typescript
-import type { RegisterRecord } from ''
+import type { FeedbackAddRecord } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "name": null,
-  "email": null,
-  "password": null,
-  "confirmPassword": null,
-  "role": null,
-  "bio": null,
-  "socialMediaLink": null,
-} satisfies RegisterRecord
+  "type": null,
+  "rating": null,
+  "isAnonymous": null,
+  "comment": null,
+} satisfies FeedbackAddRecord
 
 console.log(example)
 
@@ -37,7 +31,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as RegisterRecord
+const exampleParsed = JSON.parse(exampleJSON) as FeedbackAddRecord
 console.log(exampleParsed)
 ```
 

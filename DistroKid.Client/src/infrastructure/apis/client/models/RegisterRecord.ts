@@ -57,6 +57,18 @@ export interface RegisterRecord {
      * @memberof RegisterRecord
      */
     role: UserRoleEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof RegisterRecord
+     */
+    bio?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof RegisterRecord
+     */
+    socialMediaLink?: string | null;
 }
 
 
@@ -88,6 +100,8 @@ export function RegisterRecordFromJSONTyped(json: any, ignoreDiscriminator: bool
         'password': json['password'],
         'confirmPassword': json['confirmPassword'],
         'role': UserRoleEnumFromJSON(json['role']),
+        'bio': json['bio'] == null ? undefined : json['bio'],
+        'socialMediaLink': json['socialMediaLink'] == null ? undefined : json['socialMediaLink'],
     };
 }
 
@@ -107,6 +121,8 @@ export function RegisterRecordToJSONTyped(value?: RegisterRecord | null, ignoreD
         'password': value['password'],
         'confirmPassword': value['confirmPassword'],
         'role': UserRoleEnumToJSON(value['role']),
+        'bio': value['bio'],
+        'socialMediaLink': value['socialMediaLink'],
     };
 }
 

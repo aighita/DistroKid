@@ -9,7 +9,8 @@ const menuItems = [
   { label: 'RELEASEs', ariaLabel: 'View your releases', link: '/releases' },
   { label: 'PLATFORMs', ariaLabel: 'View your platforms', link: '/platforms' },
   { label: 'MERCH & EVENTs', ariaLabel: 'View your merch and events', link: '/merch-and-events' },
-  { label: 'TRACKs', ariaLabel: 'View your tracks', link: '/tracks' }
+  { label: 'TRACKs', ariaLabel: 'View your tracks', link: '/tracks' },
+  { label: 'ANALYTICs', ariaLabel: 'View your analytics', link: '/analytics' }
 ];
 
 const socialItems = [

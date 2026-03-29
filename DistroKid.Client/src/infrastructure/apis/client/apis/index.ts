@@ -2,6 +2,7 @@
 /* eslint-disable */
 export * from './AuthorizationApi';
 export * from './EventApi';
+export * from './FeedbackApi';
 export * from './LabelApi';
 export * from './MerchApi';
 export * from './PlatformApi';

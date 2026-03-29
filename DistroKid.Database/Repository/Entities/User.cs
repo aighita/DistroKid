@@ -1,4 +1,4 @@
-﻿﻿using DistroKid.Database.Repository.Enums;
+using DistroKid.Database.Repository.Enums;
 using DistroKid.Infrastructure.BaseObjects;
 
 namespace DistroKid.Database.Repository.Entities;
@@ -34,4 +34,9 @@ public class User : BaseEntity
     /// Label that this user is a manager for
     /// </summary>
     public Guid? ManagerLabelId { get; set; }
+
+    /// <summary>
+    /// User profile for the One-To-One relation.
+    /// </summary>
+    public UserProfile? Profile { get; set; }
 }

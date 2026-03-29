@@ -9,6 +9,8 @@ interface RegisterFormData {
     password: string;
     confirmPassword: string;
     role: "Artist" | "Manager";
+    bio: string;
+    socialMediaLink: string;
 }
 
 export function useRegisterForm() {
@@ -21,11 +23,13 @@ export function useRegisterForm() {
         password: "",
         confirmPassword: "",
         role: "Artist",
+        bio: "",
+        socialMediaLink: "",
     });
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
@@ -54,7 +58,9 @@ export function useRegisterForm() {
                 formData.email,
                 formData.password,
                 formData.confirmPassword,
-                formData.role
+                formData.role,
+                formData.bio,
+                formData.socialMediaLink
             );
             authLogin(token, user);
             router.push("/tracks");

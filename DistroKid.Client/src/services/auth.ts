@@ -25,6 +25,8 @@ export async function register(
   password: string,
   confirmPassword: string,
   role: string,
+  bio?: string,
+  socialMediaLink?: string,
 ) {
   const registerData: RegisterRecord = {
     name,
@@ -32,6 +34,8 @@ export async function register(
     password,
     confirmPassword,
     role: role as any,
+    bio,
+    socialMediaLink,
   };
 
   const response = await getApi().apiAuthorizationRegisterPost({ registerRecord: registerData });

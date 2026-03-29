@@ -121,143 +121,114 @@ public static class Program
         Console.WriteLine("   Artist user created");
 
         // Create tracks for the artist
-        var track1Id = Guid.NewGuid();
-        var track2Id = Guid.NewGuid();
-        var track3Id = Guid.NewGuid();
-
-        var tracks = new List<Track>
-        {
-            new()
-            {
-                Id = track1Id,
-                Title = "Midnight Echoes",
-                DurationInSeconds = 240,
-                ISRC = "USRC17607839",
-                Artist = artist
-            },
-            new()
-            {
-                Id = track2Id,
-                Title = "Neon Dreams",
-                DurationInSeconds = 210,
-                ISRC = "USRC17607840",
-                Artist = artist
-            },
-            new()
-            {
-                Id = track3Id,
-                Title = "Electric Soul",
-                DurationInSeconds = 270,
-                ISRC = "USRC17607841",
-                Artist = artist
-            }
+        var tracks = new List<Track>();
+        string[] trackTitles = { 
+            "Midnight Echoes", "Neon Dreams", "Electric Soul", "Cyber Heartbeat", 
+            "Synthwave Sunset", "Digital Rain", "Pixelated Reality", "Infinite Loop",
+            "Glitch in the Matrix", "Robotic Symphony", "Circuit Breaker", "Virtual Horizon",
+            "Analog Memories", "Frequency Modulation", "Quantum Oscillation"
         };
+
+        for (int i = 0; i < trackTitles.Length; i++)
+        {
+            tracks.Add(new Track
+            {
+                Id = Guid.NewGuid(),
+                Title = trackTitles[i],
+                DurationInSeconds = 180 + (i * 15),
+                ISRC = $"USRC17607{839 + i:D3}",
+                Artist = artist
+            });
+        }
 
         await context.Set<Track>().AddRangeAsync(tracks);
         await context.SaveChangesAsync();
 
-        Console.WriteLine("   3 tracks created for artist");
+        Console.WriteLine($"   {tracks.Count} tracks created for artist");
 
         // Create releases for the artist
-        var releaseId = Guid.NewGuid();
-        var release = new Release
+        var releases = new List<Release>
         {
-            Id = releaseId,
-            Title = "Neon Nights",
-            ReleaseDate = DateTime.UtcNow.AddMonths(-2),
-            Label = "Independent",
-            ReleaseType = ReleaseTypeEnum.EP,
-            Tracks = new List<Track> { tracks[0], tracks[1] }
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Title = "Neon Nights",
+                ReleaseDate = DateTime.UtcNow.AddMonths(-2),
+                Label = "Independent",
+                ReleaseType = ReleaseTypeEnum.EP,
+                Tracks = new List<Track> { tracks[0], tracks[1], tracks[2], tracks[3] }
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Title = "Digital Horizons",
+                ReleaseDate = DateTime.UtcNow.AddMonths(-6),
+                Label = "Independent",
+                ReleaseType = ReleaseTypeEnum.Album,
+                Tracks = tracks.GetRange(0, 10)
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Title = "Cybernetic Pulse",
+                ReleaseDate = DateTime.UtcNow.AddMonths(-1),
+                Label = "Electronic Records",
+                ReleaseType = ReleaseTypeEnum.Single,
+                Tracks = new List<Track> { tracks[4] }
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Title = "Retrowave Anthems",
+                ReleaseDate = DateTime.UtcNow.AddDays(-15),
+                Label = "Independent",
+                ReleaseType = ReleaseTypeEnum.EP,
+                Tracks = new List<Track> { tracks[5], tracks[6], tracks[7] }
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Title = "The Final Frontier",
+                ReleaseDate = DateTime.UtcNow.AddYears(-1),
+                Label = "Galaxy Music",
+                ReleaseType = ReleaseTypeEnum.Album,
+                Tracks = tracks
+            }
         };
 
-        var albumId = Guid.NewGuid();
-        var album = new Release
-        {
-            Id = albumId,
-            Title = "Digital Horizons",
-            ReleaseDate = DateTime.UtcNow.AddMonths(-6),
-            Label = "Independent",
-            ReleaseType = ReleaseTypeEnum.Album,
-            Tracks = new List<Track> { tracks[0], tracks[1], tracks[2] }
-        };
-
-        await context.Set<Release>().AddRangeAsync(release, album);
+        await context.Set<Release>().AddRangeAsync(releases);
         await context.SaveChangesAsync();
 
-        Console.WriteLine("   2 releases created for artist");
+        Console.WriteLine($"   {releases.Count} releases created for artist");
 
         // Create merch for the artist
         var merch = new List<Merch>
         {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Name = "Neon Nights T-Shirt",
-                Description = "Official merchandise from the Neon Nights EP",
-                Price = 24.99m,
-                Stock = 50,
-                Artist = artist
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Name = "Limited Edition Hoodie",
-                Description = "Exclusive hoodie with digital album artwork",
-                Price = 59.99m,
-                Stock = 25,
-                Artist = artist
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Name = "Vinyl Record - Digital Horizons",
-                Description = "180g vinyl pressing of the full album",
-                Price = 34.99m,
-                Stock = 100,
-                Artist = artist
-            }
+            new() { Id = Guid.NewGuid(), Name = "Neon Nights T-Shirt", Description = "Official merchandise from the Neon Nights EP", Price = 24.99m, Stock = 50, Artist = artist },
+            new() { Id = Guid.NewGuid(), Name = "Limited Edition Hoodie", Description = "Exclusive hoodie with digital album artwork", Price = 59.99m, Stock = 25, Artist = artist },
+            new() { Id = Guid.NewGuid(), Name = "Vinyl Record - Digital Horizons", Description = "180g vinyl pressing of the full album", Price = 34.99m, Stock = 100, Artist = artist },
+            new() { Id = Guid.NewGuid(), Name = "Artist Logo Hat", Description = "Classic snapback with embroidered logo", Price = 19.99m, Stock = 75, Artist = artist },
+            new() { Id = Guid.NewGuid(), Name = "Poster Set", Description = "Set of 3 high-quality posters", Price = 14.99m, Stock = 200, Artist = artist }
         };
 
         await context.Set<Merch>().AddRangeAsync(merch);
         await context.SaveChangesAsync();
 
-        Console.WriteLine("   3 merch items created for artist");
+        Console.WriteLine($"   {merch.Count} merch items created for artist");
 
         // Create events for the artist
         var events = new List<Event>
         {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Name = "Neon Dreams Tour - NYC",
-                Description = "Live performance of tracks from Neon Nights EP",
-                Location = "Brooklyn Steel, New York, NY",
-                Date = DateTime.UtcNow.AddMonths(2),
-                Artist = artist
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Name = "Digital Horizons Release Party",
-                Description = "Album release party for Digital Horizons",
-                Location = "Flash Factory, Los Angeles, CA",
-                Date = DateTime.UtcNow.AddMonths(3),
-                Artist = artist
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Name = "Summer Festival - Music Stage",
-                Description = "Featured artist at annual summer music festival",
-                Location = "Desert Sky Festival, Las Vegas, NV",
-                Date = DateTime.UtcNow.AddMonths(5),
-                Artist = artist
-            }
+            new() { Id = Guid.NewGuid(), Name = "Neon Dreams Tour - NYC", Description = "Live performance of tracks from Neon Nights EP", Location = "Brooklyn Steel, New York, NY", Date = DateTime.UtcNow.AddMonths(2), Artist = artist },
+            new() { Id = Guid.NewGuid(), Name = "Digital Horizons Release Party", Description = "Album release party for Digital Horizons", Location = "Flash Factory, Los Angeles, CA", Date = DateTime.UtcNow.AddMonths(3), Artist = artist },
+            new() { Id = Guid.NewGuid(), Name = "Summer Festival - Music Stage", Description = "Featured artist at annual summer music festival", Location = "Desert Sky Festival, Las Vegas, NV", Date = DateTime.UtcNow.AddMonths(5), Artist = artist },
+            new() { Id = Guid.NewGuid(), Name = "London Underground Session", Description = "Intimate acoustic set in a secret location", Location = "The Vault, London, UK", Date = DateTime.UtcNow.AddMonths(7), Artist = artist },
+            new() { Id = Guid.NewGuid(), Name = "Tokyo Synth Expo", Description = "Keynote performance for synth enthusiasts", Location = "Tokyo Dome, Tokyo, JP", Date = DateTime.UtcNow.AddMonths(9), Artist = artist }
         };
 
         await context.Set<Event>().AddRangeAsync(events);
         await context.SaveChangesAsync();
 
-        Console.WriteLine("   3 events created for artist");
+        Console.WriteLine($"   {events.Count} events created for artist");
     }
 }

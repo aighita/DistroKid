@@ -1,4 +1,4 @@
-﻿﻿using System.Net;
+﻿using System.Net;
 using DistroKid.Database.Repository;
 using DistroKid.Database.Repository.Entities;
 using DistroKid.Database.Repository.Enums;
@@ -78,7 +78,12 @@ public class UserService(IRepository<WebAppDatabaseContext> repository, ILoginSe
             Email = register.Email,
             Name = register.Name,
             Role = register.Role,
-            Password = register.Password
+            Password = register.Password,
+            Profile = new UserProfile
+            {
+                Bio = register.Bio,
+                SocialMediaLink = register.SocialMediaLink
+            }
         };
 
         await repository.AddAsync(newUser, cancellationToken); // A new entity is created and persisted in the database.

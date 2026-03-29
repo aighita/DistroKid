@@ -1,4 +1,4 @@
-﻿﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,8 +49,8 @@ public static class WebApplicationBuilderExtensions
             .AddScoped<ITrackService, TrackService>()
             .AddScoped<IReleaseService, ReleaseService>()
             .AddScoped<ILabelService, LabelService>()
-            .AddScoped<IEventService, EventService>()
-            .AddScoped<IMerchService, MerchService>();
+            .AddScoped<IMerchService, MerchService>()
+            .AddScoped<IFeedbackService, FeedbackService>();
 
         return builder;
     }

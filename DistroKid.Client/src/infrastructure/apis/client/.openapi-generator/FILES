@@ -1,6 +1,6 @@
-.openapi-generator-ignore
 apis/AuthorizationApi.ts
 apis/EventApi.ts
+apis/FeedbackApi.ts
 apis/LabelApi.ts
 apis/MerchApi.ts
 apis/PlatformApi.ts
@@ -19,6 +19,8 @@ docs/EventRecordPagedResponse.md
 docs/EventRecordPagedResponseRequestResponse.md
 docs/EventRecordRequestResponse.md
 docs/EventUpdateRecord.md
+docs/FeedbackAddRecord.md
+docs/FeedbackApi.md
 docs/HttpStatusCode.md
 docs/LabelAddRecord.md
 docs/LabelApi.md
@@ -81,6 +83,7 @@ models/EventRecordPagedResponse.ts
 models/EventRecordPagedResponseRequestResponse.ts
 models/EventRecordRequestResponse.ts
 models/EventUpdateRecord.ts
+models/FeedbackAddRecord.ts
 models/HttpStatusCode.ts
 models/LabelAddRecord.ts
 models/LabelRecord.ts

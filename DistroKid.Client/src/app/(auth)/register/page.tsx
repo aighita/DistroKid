@@ -61,6 +61,23 @@ export default function RegisterPage() {
                         <option value="Manager">Manager</option>
                     </select>
                     <Input
+                        type="text"
+                        name="socialMediaLink"
+                        placeholder="Social Media Link (optional)"
+                        className="text-sm"
+                        value={formData.socialMediaLink}
+                        onChange={handleChange}
+                        disabled={isLoading}
+                    />
+                    <textarea
+                        name="bio"
+                        placeholder="Bio (optional)"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm text-gray-900 min-h-[80px]"
+                        value={formData.bio}
+                        onChange={handleChange}
+                        disabled={isLoading}
+                    />
+                    <Input
                         type="password"
                         name="password"
                         placeholder="Password"

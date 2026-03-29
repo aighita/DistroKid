@@ -8,6 +8,7 @@ export * from './EventRecordPagedResponse';
 export * from './EventRecordPagedResponseRequestResponse';
 export * from './EventRecordRequestResponse';
 export * from './EventUpdateRecord';
+export * from './FeedbackAddRecord';
 export * from './HttpStatusCode';
 export * from './LabelAddRecord';
 export * from './LabelRecord';

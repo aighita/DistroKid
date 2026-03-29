@@ -636,7 +636,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
               )}
             </ul>
 
-            <div className="sm-secondary-links mt-4 flex flex-col gap-3">
+            {/* <div className="sm-secondary-links mt-4 flex flex-col gap-3">
               <a
                 href="/upload"
                 onClick={(e) => { e.preventDefault(); navigateWithClose('/upload'); }}
@@ -651,7 +651,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
               >
                 Analytics
               </a>
-            </div>
+            </div> */}
 
             {workingHours && workingHours.length > 0 && (
               <div className="sm-hours mt-4 flex flex-col gap-2">
@@ -666,6 +666,21 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                 </ul>
               </div>
             )}
+
+            <div className="sm-help-button mt-4">
+              <button
+                onClick={(e) => { e.preventDefault(); navigateWithClose('/feedback'); }}
+                className="w-full text-left px-4 py-3 rounded-xl border border-black/10 hover:border-[#5227FF] hover:bg-[#5227FF]/5 transition-all group flex items-center justify-between"
+              >
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-black border-none">Help & Feedback</span>
+                  <span className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">Contact support</span>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center group-hover:bg-[#5227FF] group-hover:text-white transition-colors">
+                  <span className="text-lg">?</span>
+                </div>
+              </button>
+            </div>
 
             {displaySocials && socialItems && socialItems.length > 0 && (
               <div className="sm-socials mt-auto pt-8 flex flex-col gap-3" aria-label="Social links">
