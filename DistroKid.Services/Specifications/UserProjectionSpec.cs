@@ -15,8 +15,8 @@ public sealed class UserProjectionSpec : Specification<User, UserRecord>
     /// <summary>
     /// In this constructor is the projection/mapping expression used to get UserRecord object directly from the database.
     /// </summary>
-    public UserProjectionSpec(bool orderByCreatedAt = false) =>
-        Query.OrderByDescending(x => x.CreatedAt, orderByCreatedAt)
+    public UserProjectionSpec() =>
+        Query.OrderByDescending(x => x.CreatedAt)
             .Select(e => new()
             {
                 Id = e.Id,
@@ -27,7 +27,7 @@ public sealed class UserProjectionSpec : Specification<User, UserRecord>
 
     public UserProjectionSpec(Guid id) : this() => Query.Where(e => e.Id == id); // This constructor will call the first declared constructor with the default parameter. 
 
-    public UserProjectionSpec(string? search) : this(true) // This constructor will call the first declared constructor with 'true' as the parameter. 
+    public UserProjectionSpec(string? search) : this() // This constructor will call the first declared constructor with the default parameter. 
     {
         search = !string.IsNullOrWhiteSpace(search) ? search.Trim() : null;
 

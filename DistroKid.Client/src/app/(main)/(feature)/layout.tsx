@@ -3,14 +3,17 @@
 import { useRef, useState } from "react";
 import ClickSpark from "@/components/ClickSpark";
 import StaggeredMenu from "@/components/StaggeredMenu";
-import GradientText from "@/components/GradientText";
 
-const menuItems = [
+import { useAuthStore } from "@/stores/authStore";
+import { UserRoleEnum } from "@/infrastructure/apis/client/models";
+import { useDashboardStats } from "@/hooks/useDashboardStats";
+import { useUserAvatar } from "@/hooks/useUserAvatar";
+
+const baseMenuItems = [
   { label: 'RELEASEs', ariaLabel: 'View your releases', link: '/releases' },
   { label: 'PLATFORMs', ariaLabel: 'View your platforms', link: '/platforms' },
   { label: 'MERCH & EVENTs', ariaLabel: 'View your merch and events', link: '/merch-and-events' },
-  { label: 'TRACKs', ariaLabel: 'View your tracks', link: '/tracks' },
-  { label: 'ANALYTICs', ariaLabel: 'View your analytics', link: '/analytics' }
+  { label: 'TRACKs', ariaLabel: 'View your tracks', link: '/tracks' }
 ];
 
 const socialItems = [
@@ -25,8 +28,17 @@ export default function FeatureLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = useAuthStore((s) => s.user);
   const [menuOpen, setMenuOpen] = useState(false);
   const mainRef = useRef<HTMLElement>(null);
+  const avatarUrl = useUserAvatar();
+  const { tracks, releases, merch, events } = useDashboardStats();
+
+  const menuItems = [...baseMenuItems];
+  if (user?.role === UserRoleEnum.Admin) {
+      menuItems.push({ label: 'USERS', ariaLabel: 'Manage users', link: '/admin/users' });
+      menuItems.push({ label: 'FEEDBACK', ariaLabel: 'View feedback', link: '/admin/feedback' });
+  }
 
   return (
     <ClickSpark
@@ -38,15 +50,6 @@ export default function FeatureLayout({
     >
       <StaggeredMenu
         position="left"
-        // logoUrl="/"
-        // logo={<GradientText
-        //         colors={["#5227FF","#7C4DFF","#B19EEF"]}
-        //         animationSpeed={4}
-        //         showBorder={false}
-        //         className="custom-class"
-        //       >
-        //         DistroKid
-        //       </GradientText>}
         items={menuItems}
         socialItems={socialItems}
         displaySocials
@@ -58,13 +61,16 @@ export default function FeatureLayout({
         accentColor="#5227FF"
         isFixed={true}
         workingHours={[
-          { day: 'Total Streams', hours: '2.4M' },
-          { day: 'Followers', hours: '18.5K' },
-          { day: 'Top Track', hours: '642K plays' }
+          { day: 'Tracks', hours: String(tracks) },
+          { day: 'Releases', hours: String(releases) },
+          { day: 'Merch', hours: String(merch) },
+          { day: 'Events', hours: String(events) }
         ]}
         onMenuOpen={() => setMenuOpen(true)}
         onMenuClose={() => setMenuOpen(false)}
         contentRef={mainRef}
+        userName={user?.name}
+        avatarUrl={avatarUrl}
       />
       <main ref={mainRef}>
         {children}

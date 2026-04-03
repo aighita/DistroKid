@@ -14,8 +14,8 @@ public sealed class UserFileProjectionSpec : Specification<UserFile, UserFileRec
     /// <summary>
     /// Note that the specification projects the UserFile onto UserFileRecord together with the referenced User entity properties.
     /// </summary>
-    public UserFileProjectionSpec(bool orderByCreatedAt = false) =>
-        Query.OrderByDescending(x => x.CreatedAt, orderByCreatedAt)
+    public UserFileProjectionSpec() =>
+        Query.OrderByDescending(x => x.CreatedAt)
             .Select(e => new()
             {
                 Id = e.Id,
@@ -32,7 +32,7 @@ public sealed class UserFileProjectionSpec : Specification<UserFile, UserFileRec
                 UpdatedAt = e.UpdatedAt
             });
 
-    public UserFileProjectionSpec(string? search) : this(true)
+    public UserFileProjectionSpec(string? search) : this()
     {
         search = !string.IsNullOrWhiteSpace(search) ? search.Trim() : null;
 

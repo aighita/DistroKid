@@ -34,8 +34,10 @@ public static class Program
             .MigrateDatabase<WebAppDatabaseContext>();
 
         // Rewrite clean URL paths to their corresponding static HTML files before serving
+        // Only rewrite single-segment routes (e.g., /tracks -> tracks.html)
+        // Do NOT rewrite nested routes (e.g., /admin/feedback remains as is for Next.js to handle)
         var rewriteOptions = new RewriteOptions()
-            .AddRewrite(@"^(?!(_next/|api/))([^/.]+)/.*$", "$2.html", skipRemainingRules: true);
+            .AddRewrite(@"^(?!(_next/|api/))([^/.]+)/?$", "$2.html", skipRemainingRules: true);
         app.UseRewriter(rewriteOptions);
 
         app.UseDefaultFiles();

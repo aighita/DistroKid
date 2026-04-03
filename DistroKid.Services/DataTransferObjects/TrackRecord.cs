@@ -7,4 +7,5 @@ public class TrackRecord
     public int DurationInSeconds { get; set; }
     public string ISRC { get; set; } = null!;
     public Guid ArtistId { get; set; }
+    public UserRecord? Artist { get; set; }
 }

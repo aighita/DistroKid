@@ -8,14 +8,24 @@ using DistroKid.Infrastructure.Requests;
 using DistroKid.Infrastructure.Responses;
 using DistroKid.Services.Abstractions;
 using DistroKid.Services.DataTransferObjects;
+using DistroKid.Services.Helpers;
 using DistroKid.Services.Specifications;
 
 namespace DistroKid.Services.Implementations;
 
 public class TrackService(IRepository<WebAppDatabaseContext> repository) : ITrackService
 {
-    public async Task<ServiceResponse<TrackRecord>> GetTrackById(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse<TrackRecord>> GetTrackById(Guid id, UserRecord requestingUser, CancellationToken cancellationToken = default)
     {
+        var accessibleArtistIds = await AccessScopeHelper.GetAccessibleArtistIds(repository, requestingUser, cancellationToken);
+        var entity = await repository.GetAsync(new TrackSpec(id), cancellationToken);
+
+        if (entity == null)
+            return ServiceResponse.FromError<TrackRecord>(CommonErrors.TrackNotFound);
+
+        if (!AccessScopeHelper.CanAccessArtist(requestingUser, entity.ArtistId, accessibleArtistIds))
+            return ServiceResponse.FromError<TrackRecord>(new(HttpStatusCode.Forbidden, "You cannot access this track!", ErrorCodes.CannotRead));
+
         var result = await repository.GetAsync(new TrackProjectionSpec(id), cancellationToken);
 
         return result != null
@@ -23,9 +33,10 @@ public class TrackService(IRepository<WebAppDatabaseContext> repository) : ITrac
             : ServiceResponse.FromError<TrackRecord>(CommonErrors.TrackNotFound);
     }
 
-    public async Task<ServiceResponse<PagedResponse<TrackRecord>>> GetTracks(PaginationSearchQueryParams pagination, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse<PagedResponse<TrackRecord>>> GetTracks(PaginationSearchQueryParams pagination, UserRecord requestingUser, CancellationToken cancellationToken = default)
     {
-        var result = await repository.PageAsync(pagination, new TrackProjectionSpec(pagination.Search), cancellationToken);
+        var accessibleArtistIds = await AccessScopeHelper.GetAccessibleArtistIds(repository, requestingUser, cancellationToken);
+        var result = await repository.PageAsync(pagination, new TrackProjectionSpec(pagination.Search, accessibleArtistIds), cancellationToken);
         return ServiceResponse.ForSuccess(result);
     }
 

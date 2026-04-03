@@ -1,4 +1,4 @@
-﻿﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using DistroKid.Infrastructure.Authorization;
 using DistroKid.Infrastructure.Requests;
@@ -36,7 +36,7 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
     /// Generally, if you need to get multiple values from the database use pagination if there are many entries.
     /// It will improve performance and reduce resource consumption for both client and server.
     /// </summary>
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpGet] // This attribute will make the controller respond to a HTTP GET request on the route /api/User/GetPage.
     public async Task<ActionResult<RequestResponse<PagedResponse<UserRecord>>>> GetPage([FromQuery] PaginationSearchQueryParams pagination) // The FromQuery attribute will bind the parameters matching the names of
                                                                                                                                          // the PaginationSearchQueryParams properties to the object in the method parameter.
@@ -56,6 +56,39 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
 
         return currentUser.Result != null ?
             FromServiceResponse(await UserService.GetUserPlatforms(currentUser.Result.Id, currentUser.Result)) :
+            ErrorMessageResult<List<PlatformRecord>>(currentUser.Error);
+    }
+
+    [Authorize]
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<RequestResponse<List<PlatformRecord>>>> GetUserPlatformsById([FromRoute] Guid id)
+    {
+        var currentUser = await GetCurrentUser();
+
+        return currentUser.Result != null ?
+            FromServiceResponse(await UserService.GetUserPlatforms(id, currentUser.Result)) :
+            ErrorMessageResult<List<PlatformRecord>>(currentUser.Error);
+    }
+
+    [Authorize]
+    [HttpPut("{platformId:guid}")]
+    public async Task<ActionResult<RequestResponse<List<PlatformRecord>>>> ConnectPlatform([FromRoute] Guid platformId)
+    {
+        var currentUser = await GetCurrentUser();
+
+        return currentUser.Result != null ?
+            FromServiceResponse(await UserService.ConnectPlatform(platformId, currentUser.Result)) :
+            ErrorMessageResult<List<PlatformRecord>>(currentUser.Error);
+    }
+
+    [Authorize]
+    [HttpPut("{platformId:guid}")]
+    public async Task<ActionResult<RequestResponse<List<PlatformRecord>>>> DisconnectPlatform([FromRoute] Guid platformId)
+    {
+        var currentUser = await GetCurrentUser();
+
+        return currentUser.Result != null ?
+            FromServiceResponse(await UserService.DisconnectPlatform(platformId, currentUser.Result)) :
             ErrorMessageResult<List<PlatformRecord>>(currentUser.Error);
     }
 

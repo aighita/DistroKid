@@ -24,7 +24,7 @@ public class MerchController(ILogger<MerchController> logger, IUserService userS
         var currentUser = await GetCurrentUser();
 
         return currentUser.Result != null ?
-            FromServiceResponse(await MerchService.GetMerchById(id)) :
+            FromServiceResponse(await MerchService.GetMerchById(id, currentUser.Result)) :
             ErrorMessageResult<MerchRecord>(currentUser.Error);
     }
 
@@ -35,7 +35,7 @@ public class MerchController(ILogger<MerchController> logger, IUserService userS
         var currentUser = await GetCurrentUser();
 
         return currentUser.Result != null ?
-            FromServiceResponse(await MerchService.GetMerch(pagination)) :
+            FromServiceResponse(await MerchService.GetMerch(pagination, currentUser.Result)) :
             ErrorMessageResult<PagedResponse<MerchRecord>>(currentUser.Error);
     }
 

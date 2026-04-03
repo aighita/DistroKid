@@ -64,17 +64,17 @@ const cardData: BentoCardProps[] = [
   },
   {
     color: '#ffffff',
-    title: 'Analytics',
-    description: 'Track streams, followers and growth',
-    label: 'Insights',
-    href: '/analytics'
-  },
-  {
-    color: '#ffffff',
     title: 'Tracks',
     description: 'Browse and manage individual tracks',
     label: 'Library',
     href: '/tracks'
+  },
+  {
+    color: '#ffffff',
+    title: 'Feedback',
+    description: 'Send us your thoughts and suggestions',
+    label: 'Feedback',
+    href: '/feedback'
   }
 ];
 

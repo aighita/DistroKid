@@ -10,9 +10,10 @@ namespace DistroKid.Services.Specifications;
 /// </summary>
 public sealed class MerchProjectionSpec : Specification<Merch, MerchRecord>
 {
-    public MerchProjectionSpec(bool orderByName = false) =>
+    public MerchProjectionSpec() =>
         Query
-            .OrderBy(m => m.Name, orderByName)
+            .Include(m => m.Artist)
+            .OrderBy(m => m.Name)
             .Select(m => new MerchRecord
             {
                 Id = m.Id,
@@ -20,13 +21,26 @@ public sealed class MerchProjectionSpec : Specification<Merch, MerchRecord>
                 Description = m.Description,
                 Price = m.Price,
                 Stock = m.Stock,
-                ArtistId = m.ArtistId
+                ArtistId = m.ArtistId,
+                Artist = new UserRecord
+                {
+                    Id = m.Artist.Id,
+                    Name = m.Artist.Name,
+                    Email = m.Artist.Email,
+                    Role = m.Artist.Role
+                }
             });
 
     /// <summary>Used by GetMerch (pagination) — orders by name and optionally filters by search.</summary>
-    public MerchProjectionSpec(string? search) : this(true)
+    public MerchProjectionSpec(string? search, IEnumerable<Guid>? artistIds = null) : this()
     {
         search = !string.IsNullOrWhiteSpace(search) ? search.Trim() : null;
+
+        if (artistIds != null)
+        {
+            var scopedArtistIds = artistIds.ToList();
+            Query.Where(m => scopedArtistIds.Contains(m.ArtistId));
+        }
 
         if (search == null)
         {

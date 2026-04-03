@@ -8,18 +8,23 @@ using DistroKid.Infrastructure.Requests;
 using DistroKid.Infrastructure.Responses;
 using DistroKid.Services.Abstractions;
 using DistroKid.Services.DataTransferObjects;
+using DistroKid.Services.Helpers;
 using DistroKid.Services.Specifications;
 
 namespace DistroKid.Services.Implementations;
 
 public class MerchService(IRepository<WebAppDatabaseContext> repository) : IMerchService
 {
-    public async Task<ServiceResponse<MerchRecord>> GetMerchById(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse<MerchRecord>> GetMerchById(Guid id, UserRecord requestingUser, CancellationToken cancellationToken = default)
     {
+        var accessibleArtistIds = await AccessScopeHelper.GetAccessibleArtistIds(repository, requestingUser, cancellationToken);
         var entity = await repository.GetAsync(new MerchSpec(id), cancellationToken);
 
         if (entity == null)
             return ServiceResponse.FromError<MerchRecord>(CommonErrors.MerchNotFound);
+
+        if (!AccessScopeHelper.CanAccessArtist(requestingUser, entity.ArtistId, accessibleArtistIds))
+            return ServiceResponse.FromError<MerchRecord>(new(HttpStatusCode.Forbidden, "You cannot access this merch item!", ErrorCodes.CannotRead));
 
         return ServiceResponse.ForSuccess(new MerchRecord
         {
@@ -32,9 +37,10 @@ public class MerchService(IRepository<WebAppDatabaseContext> repository) : IMerc
         });
     }
 
-    public async Task<ServiceResponse<PagedResponse<MerchRecord>>> GetMerch(PaginationSearchQueryParams pagination, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse<PagedResponse<MerchRecord>>> GetMerch(PaginationSearchQueryParams pagination, UserRecord requestingUser, CancellationToken cancellationToken = default)
     {
-        var result = await repository.PageAsync(pagination, new MerchProjectionSpec(pagination.Search), cancellationToken);
+        var accessibleArtistIds = await AccessScopeHelper.GetAccessibleArtistIds(repository, requestingUser, cancellationToken);
+        var result = await repository.PageAsync(pagination, new MerchProjectionSpec(pagination.Search, accessibleArtistIds), cancellationToken);
         return ServiceResponse.ForSuccess(result);
     }
 

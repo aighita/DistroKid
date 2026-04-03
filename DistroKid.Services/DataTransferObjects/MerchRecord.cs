@@ -9,4 +9,5 @@ public class MerchRecord
     public decimal Price { get; set; }
     public int Stock { get; set; }
     public Guid ArtistId { get; set; }
+    public UserRecord? Artist { get; set; }
 }

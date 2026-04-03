@@ -13,6 +13,11 @@
  */
 
 import { mapValues } from '../runtime';
+import type { UserRecord } from './UserRecord';
+import {
+    UserRecordFromJSON,
+    UserRecordToJSON,
+} from './UserRecord';
 /**
  * 
  * @export
@@ -49,6 +54,12 @@ export interface TrackRecord {
      * @memberof TrackRecord
      */
     artistId: string;
+    /**
+     * 
+     * @type {UserRecord}
+     * @memberof TrackRecord
+     */
+    artist?: UserRecord | null;
 }
 
 /**
@@ -78,6 +89,7 @@ export function TrackRecordFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'durationInSeconds': json['durationInSeconds'],
         'isrc': json['isrc'],
         'artistId': json['artistId'],
+        'artist': json['artist'] == null ? undefined : UserRecordFromJSON(json['artist']),
     };
 }
 
@@ -97,6 +109,7 @@ export function TrackRecordToJSONTyped(value?: TrackRecord | null, ignoreDiscrim
         'durationInSeconds': value['durationInSeconds'],
         'isrc': value['isrc'],
         'artistId': value['artistId'],
+        'artist': value['artist'] == null ? value['artist'] : UserRecordToJSON(value['artist']),
     };
 }
 

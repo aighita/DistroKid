@@ -49,6 +49,7 @@ public static class WebApplicationBuilderExtensions
             .AddScoped<ITrackService, TrackService>()
             .AddScoped<IReleaseService, ReleaseService>()
             .AddScoped<ILabelService, LabelService>()
+            .AddScoped<IEventService, EventService>()
             .AddScoped<IMerchService, MerchService>()
             .AddScoped<IFeedbackService, FeedbackService>();
 

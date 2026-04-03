@@ -16,17 +16,26 @@
 import * as runtime from '../runtime';
 import type {
   FeedbackAddRecord,
+  FeedbackRecordPagedResponseRequestResponse,
   RequestResponse,
 } from '../models/index';
 import {
     FeedbackAddRecordFromJSON,
     FeedbackAddRecordToJSON,
+    FeedbackRecordPagedResponseRequestResponseFromJSON,
+    FeedbackRecordPagedResponseRequestResponseToJSON,
     RequestResponseFromJSON,
     RequestResponseToJSON,
 } from '../models/index';
 
 export interface ApiFeedbackAddPostRequest {
     feedbackAddRecord?: FeedbackAddRecord;
+}
+
+export interface ApiFeedbackGetPageGetRequest {
+    search?: string;
+    page?: number;
+    pageSize?: number;
 }
 
 /**
@@ -77,6 +86,61 @@ export class FeedbackApi extends runtime.BaseAPI {
      */
     async apiFeedbackAddPost(requestParameters: ApiFeedbackAddPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RequestResponse> {
         const response = await this.apiFeedbackAddPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for apiFeedbackGetPageGet without sending the request
+     */
+    async apiFeedbackGetPageGetRequestOpts(requestParameters: ApiFeedbackGetPageGetRequest): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        if (requestParameters['search'] != null) {
+            queryParameters['Search'] = requestParameters['search'];
+        }
+
+        if (requestParameters['page'] != null) {
+            queryParameters['Page'] = requestParameters['page'];
+        }
+
+        if (requestParameters['pageSize'] != null) {
+            queryParameters['PageSize'] = requestParameters['pageSize'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/Feedback/GetPage`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     */
+    async apiFeedbackGetPageGetRaw(requestParameters: ApiFeedbackGetPageGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FeedbackRecordPagedResponseRequestResponse>> {
+        const requestOptions = await this.apiFeedbackGetPageGetRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => FeedbackRecordPagedResponseRequestResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiFeedbackGetPageGet(requestParameters: ApiFeedbackGetPageGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FeedbackRecordPagedResponseRequestResponse> {
+        const response = await this.apiFeedbackGetPageGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

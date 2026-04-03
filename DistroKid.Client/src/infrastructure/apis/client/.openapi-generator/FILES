@@ -21,6 +21,9 @@ docs/EventRecordRequestResponse.md
 docs/EventUpdateRecord.md
 docs/FeedbackAddRecord.md
 docs/FeedbackApi.md
+docs/FeedbackRecord.md
+docs/FeedbackRecordPagedResponse.md
+docs/FeedbackRecordPagedResponseRequestResponse.md
 docs/HttpStatusCode.md
 docs/LabelAddRecord.md
 docs/LabelApi.md
@@ -84,6 +87,9 @@ models/EventRecordPagedResponseRequestResponse.ts
 models/EventRecordRequestResponse.ts
 models/EventUpdateRecord.ts
 models/FeedbackAddRecord.ts
+models/FeedbackRecord.ts
+models/FeedbackRecordPagedResponse.ts
+models/FeedbackRecordPagedResponseRequestResponse.ts
 models/HttpStatusCode.ts
 models/LabelAddRecord.ts
 models/LabelRecord.ts

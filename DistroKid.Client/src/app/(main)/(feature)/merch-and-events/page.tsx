@@ -190,6 +190,7 @@ function EventForm({
 export default function MerchAndEvents() {
   const user = useAuthStore((s) => s.user);
   const canEdit = user?.role === "Artist" || user?.role === "Admin";
+  const isAdmin = user?.role === "Admin";
 
   // â”€â”€ Merch state â”€â”€
   const {
@@ -230,7 +231,7 @@ export default function MerchAndEvents() {
   React.useEffect(() => {
     mFetch(1, "");
     eFetch(1, "");
-  }, []);
+  }, [eFetch, mFetch]);
 
   // â”€â”€ Merch columns â”€â”€
   const merchColumns: ColumnDef<MerchRecord, unknown>[] = [
@@ -239,6 +240,19 @@ export default function MerchAndEvents() {
       header: ({ column }) => <DataTableColumnHeader column={column} title="Item" />,
       cell: ({ row }) => <div className="font-medium">{row.getValue("name")}</div>,
     },
+    ...(isAdmin
+      ? [
+          {
+            id: "artist",
+            header: ({ column }: { column: any }) => <DataTableColumnHeader column={column} title="Artist" />,
+            cell: ({ row }: { row: { original: MerchRecord } }) => (
+              <span className="text-muted-foreground text-sm">
+                {row.original.artist?.name || row.original.artistId || "-"}
+              </span>
+            ),
+          } as ColumnDef<MerchRecord, unknown>,
+        ]
+      : []),
     {
       accessorKey: "description",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Description" />,
@@ -303,6 +317,19 @@ export default function MerchAndEvents() {
       header: ({ column }) => <DataTableColumnHeader column={column} title="Event" />,
       cell: ({ row }) => <div className="font-medium">{row.getValue("name")}</div>,
     },
+    ...(isAdmin
+      ? [
+          {
+            id: "artist",
+            header: ({ column }: { column: any }) => <DataTableColumnHeader column={column} title="Artist" />,
+            cell: ({ row }: { row: { original: EventRecord } }) => (
+              <span className="text-muted-foreground text-sm">
+                {row.original.artist?.name || "-"}
+              </span>
+            ),
+          } as ColumnDef<EventRecord, unknown>,
+        ]
+      : []),
     {
       accessorKey: "location",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Location" />,

@@ -8,18 +8,23 @@ using DistroKid.Infrastructure.Requests;
 using DistroKid.Infrastructure.Responses;
 using DistroKid.Services.Abstractions;
 using DistroKid.Services.DataTransferObjects;
+using DistroKid.Services.Helpers;
 using DistroKid.Services.Specifications;
 
 namespace DistroKid.Services.Implementations;
 
 public class EventService(IRepository<WebAppDatabaseContext> repository) : IEventService
 {
-    public async Task<ServiceResponse<EventRecord>> GetEventById(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse<EventRecord>> GetEventById(Guid id, UserRecord requestingUser, CancellationToken cancellationToken = default)
     {
+        var accessibleArtistIds = await AccessScopeHelper.GetAccessibleArtistIds(repository, requestingUser, cancellationToken);
         var entity = await repository.GetAsync(new EventSpec(id), cancellationToken);
 
         if (entity == null)
             return ServiceResponse.FromError<EventRecord>(CommonErrors.EventNotFound);
+
+        if (!AccessScopeHelper.CanAccessArtist(requestingUser, entity.Artist.Id, accessibleArtistIds))
+            return ServiceResponse.FromError<EventRecord>(new(HttpStatusCode.Forbidden, "You cannot access this event!", ErrorCodes.CannotRead));
 
         return ServiceResponse.ForSuccess(new EventRecord
         {
@@ -38,9 +43,10 @@ public class EventService(IRepository<WebAppDatabaseContext> repository) : IEven
         });
     }
 
-    public async Task<ServiceResponse<PagedResponse<EventRecord>>> GetEvents(PaginationSearchQueryParams pagination, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse<PagedResponse<EventRecord>>> GetEvents(PaginationSearchQueryParams pagination, UserRecord requestingUser, CancellationToken cancellationToken = default)
     {
-        var result = await repository.PageAsync(pagination, new EventProjectionSpec(pagination.Search), cancellationToken);
+        var accessibleArtistIds = await AccessScopeHelper.GetAccessibleArtistIds(repository, requestingUser, cancellationToken);
+        var result = await repository.PageAsync(pagination, new EventProjectionSpec(pagination.Search, accessibleArtistIds), cancellationToken);
         return ServiceResponse.ForSuccess(result);
     }
 

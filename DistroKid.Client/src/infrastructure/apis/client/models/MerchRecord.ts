@@ -13,6 +13,11 @@
  */
 
 import { mapValues } from '../runtime';
+import type { UserRecord } from './UserRecord';
+import {
+    UserRecordFromJSON,
+    UserRecordToJSON,
+} from './UserRecord';
 /**
  * 
  * @export
@@ -55,6 +60,12 @@ export interface MerchRecord {
      * @memberof MerchRecord
      */
     artistId: string;
+    /**
+     * 
+     * @type {UserRecord}
+     * @memberof MerchRecord
+     */
+    artist?: UserRecord | null;
 }
 
 /**
@@ -86,6 +97,7 @@ export function MerchRecordFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'price': json['price'],
         'stock': json['stock'],
         'artistId': json['artistId'],
+        'artist': json['artist'] == null ? undefined : UserRecordFromJSON(json['artist']),
     };
 }
 
@@ -106,6 +118,7 @@ export function MerchRecordToJSONTyped(value?: MerchRecord | null, ignoreDiscrim
         'price': value['price'],
         'stock': value['stock'],
         'artistId': value['artistId'],
+        'artist': value['artist'] == null ? value['artist'] : UserRecordToJSON(value['artist']),
     };
 }
 

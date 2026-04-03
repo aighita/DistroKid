@@ -45,6 +45,8 @@ export interface StaggeredMenuProps {
   contentRef?: React.RefObject<HTMLElement | null>;
   onMenuOpen?: () => void;
   onMenuClose?: () => void;
+  userName?: string;
+  avatarUrl?: string;
 }
 
 export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
@@ -67,7 +69,9 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   contactInfo = [],
   contentRef,
   onMenuOpen,
-  onMenuClose
+  onMenuClose,
+  userName = 'User',
+  avatarUrl
 }: StaggeredMenuProps) => {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -589,20 +593,19 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                   href="/"
                   onClick={(e) => { e.preventDefault(); navigateWithClose('/'); }}
                   className="sm-panel-item sm-panel-profile relative text-black font-semibold text-lg cursor-pointer leading-tight transition-[background,color] duration-150 ease-linear inline-block no-underline pr-[1.4em]"
-
                 >
                   <div className="flex flex-row items-center gap-3">
                     <Avatar className="sm-panel-avatar grayscale hover:grayscale-0 transition-[filter] duration-300" size="lg">
                       <AvatarImage
-                        src="https://github.com/shadcn.png"
-                        alt="@shadcn"
+                        src={avatarUrl || "https://github.com/shadcn.png"}
+                        alt={userName}
                         className=""
                       />
-                      <AvatarFallback>CN</AvatarFallback>
+                      <AvatarFallback>{userName?.[0]?.toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
                       <span className="sm-panel-itemLabel block font-semibold text-4xl [transform-origin:50%_100%] will-change-transform">
-                        Youlee
+                        {userName}
                       </span>
                     </div>
                   </div>

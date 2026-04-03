@@ -12,4 +12,5 @@ public class ReleaseRecord
     public ReleaseTypeEnum ReleaseType { get; set; }
     public List<TrackRecord> Tracks { get; set; } = new List<TrackRecord>();
     public List<PlatformRecord> Platforms { get; set; } = new List<PlatformRecord>();
+    public UserRecord? Artist { get; set; }
 }

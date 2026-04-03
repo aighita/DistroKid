@@ -24,7 +24,7 @@ public class TrackController(ILogger<TrackController> logger, IUserService userS
         var currentUser = await GetCurrentUser();
 
         return currentUser.Result != null ?
-            FromServiceResponse(await TrackService.GetTrackById(id)) :
+            FromServiceResponse(await TrackService.GetTrackById(id, currentUser.Result)) :
             ErrorMessageResult<TrackRecord>(currentUser.Error);
     }
 
@@ -35,7 +35,7 @@ public class TrackController(ILogger<TrackController> logger, IUserService userS
         var currentUser = await GetCurrentUser();
 
         return currentUser.Result != null ?
-            FromServiceResponse(await TrackService.GetTracks(pagination)) :
+            FromServiceResponse(await TrackService.GetTracks(pagination, currentUser.Result)) :
             ErrorMessageResult<PagedResponse<TrackRecord>>(currentUser.Error);
     }
 

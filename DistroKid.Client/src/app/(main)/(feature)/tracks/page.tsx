@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter, useSearchParams } from "next/navigation";
 import { type ColumnDef } from "@tanstack/react-table";
 import { useDataTable, DataTableColumnHeader } from "@/components/data-table1";
 import { Button } from "@/components/ui/button";
@@ -114,8 +115,11 @@ function TrackForm({
 // â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function Tracks() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const user = useAuthStore((s) => s.user);
   const canEdit = user?.role === "Artist" || user?.role === "Admin";
+  const isAdmin = user?.role === "Admin";
 
   const { items, page, pageCount, isLoading, error, fetchPage, handleAdd, handleUpdate, handleDelete } =
     useTrack();
@@ -128,7 +132,20 @@ export default function Tracks() {
 
   React.useEffect(() => {
     fetchPage(1, "");
-  }, []);
+  }, [fetchPage]);
+
+  React.useEffect(() => {
+    if (!canEdit || searchParams.get("openAdd") !== "1") {
+      return;
+    }
+
+    setAddOpen(true);
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("openAdd");
+    const query = params.toString();
+    router.replace(query ? `/tracks?${query}` : "/tracks");
+  }, [canEdit, router, searchParams]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value);
@@ -141,6 +158,26 @@ export default function Tracks() {
       header: ({ column }) => <DataTableColumnHeader column={column} title="Title" />,
       cell: ({ row }) => <div className="font-medium">{row.getValue("title")}</div>,
     },
+    ...(isAdmin
+      ? [
+          {
+            id: "artist",
+            header: ({ column }: { column: any }) => <DataTableColumnHeader column={column} title="Artist" />,
+            cell: ({ row }: { row: { original: TrackRecord } }) => {
+              const track = row.original as TrackRecord & {
+                artist?: { name?: string | null } | null;
+                artistId?: string | null;
+              };
+
+              return (
+                <span className="text-muted-foreground">
+                  {track.artist?.name || track.artistId || "-"}
+                </span>
+              );
+            },
+          } as ColumnDef<TrackRecord, unknown>,
+        ]
+      : []),
     {
       accessorKey: "durationInSeconds",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Duration" />,

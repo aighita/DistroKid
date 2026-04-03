@@ -24,7 +24,7 @@ public class EventController(ILogger<EventController> logger, IUserService userS
         var currentUser = await GetCurrentUser();
 
         return currentUser.Result != null ?
-            FromServiceResponse(await EventService.GetEventById(id)) :
+            FromServiceResponse(await EventService.GetEventById(id, currentUser.Result)) :
             ErrorMessageResult<EventRecord>(currentUser.Error);
     }
 
@@ -35,7 +35,7 @@ public class EventController(ILogger<EventController> logger, IUserService userS
         var currentUser = await GetCurrentUser();
 
         return currentUser.Result != null ?
-            FromServiceResponse(await EventService.GetEvents(pagination)) :
+            FromServiceResponse(await EventService.GetEvents(pagination, currentUser.Result)) :
             ErrorMessageResult<PagedResponse<EventRecord>>(currentUser.Error);
     }
 

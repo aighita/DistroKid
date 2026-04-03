@@ -9,6 +9,7 @@ using DistroKid.Infrastructure.Responses;
 using DistroKid.Services.Abstractions;
 using DistroKid.Services.Constants;
 using DistroKid.Services.DataTransferObjects;
+using DistroKid.Services.Helpers;
 using DistroKid.Services.Specifications;
 
 namespace DistroKid.Services.Implementations;
@@ -46,7 +47,7 @@ public class UserService(IRepository<WebAppDatabaseContext> repository, ILoginSe
 
         if (result.Password != login.Password) // Verify if the password hash of the request is the same as the one in the database.
         {
-            return ServiceResponse.FromError<LoginResponseRecord>(new(HttpStatusCode.BadRequest, "Wrong password!", ErrorCodes.WrongPassword));
+            return ServiceResponse.FromError<LoginResponseRecord>(new(HttpStatusCode.BadRequest, "Incorrect password. Please try again.", ErrorCodes.WrongPassword));
         }
 
         var user = new UserRecord
@@ -70,7 +71,7 @@ public class UserService(IRepository<WebAppDatabaseContext> repository, ILoginSe
 
         if (result != null) // Verify if the user already exists in the database.
         {
-            return ServiceResponse.FromError<LoginResponseRecord>(new(HttpStatusCode.Conflict, "The user already exists!", ErrorCodes.UserAlreadyExists));
+            return ServiceResponse.FromError<LoginResponseRecord>(new(HttpStatusCode.Conflict, "An account with this email already exists. Please log in instead.", ErrorCodes.UserAlreadyExists));
         }
 
         var newUser = new User
@@ -119,7 +120,7 @@ public class UserService(IRepository<WebAppDatabaseContext> repository, ILoginSe
 
         if (result != null)
         {
-            return ServiceResponse.FromError(new(HttpStatusCode.Conflict, "The user already exists!", ErrorCodes.UserAlreadyExists));
+            return ServiceResponse.FromError(new(HttpStatusCode.Conflict, "A user with this email already exists.", ErrorCodes.UserAlreadyExists));
         }
 
         await repository.AddAsync(new User
@@ -169,19 +170,26 @@ public class UserService(IRepository<WebAppDatabaseContext> repository, ILoginSe
 
     public async Task<ServiceResponse<List<PlatformRecord>>> GetUserPlatforms(Guid id, UserRecord? requestingUser = null, CancellationToken cancellationToken = default)
     {
-        if (requestingUser != null && requestingUser.Id != id && requestingUser.Role != UserRoleEnum.Artist) // Verify who can get the platforms, you can change this however you se fit.
+        if (requestingUser != null && requestingUser.Id != id)
         {
-            return ServiceResponse.FromError<List<PlatformRecord>>(new(HttpStatusCode.Forbidden, "Only artists can have connected platforms!", ErrorCodes.UserNotArtist));
+            if (requestingUser.Role != UserRoleEnum.Admin)
+            {
+                var accessibleArtistIds = await AccessScopeHelper.GetAccessibleArtistIds(repository, requestingUser, cancellationToken);
+                if (!AccessScopeHelper.CanAccessArtist(requestingUser, id, accessibleArtistIds))
+                {
+                    return ServiceResponse.FromError<List<PlatformRecord>>(new(HttpStatusCode.Forbidden, "You cannot access the connected platforms for this user!", ErrorCodes.CannotRead));
+                }
+            }
         }
 
-        var user = await repository.GetAsync(new UserSpec(id), cancellationToken);
+        var user = await repository.GetAsync(new UserWithPlatformsSpec(id), cancellationToken);
 
-        if (user == null || user.Platforms == null || user.Platforms.Count == 0) // Verify if the user has platforms connected.
+        if (user == null)
         {
-            return ServiceResponse.FromError<List<PlatformRecord>>(CommonErrors.NoPlatformsFound);
+            return ServiceResponse.FromError<List<PlatformRecord>>(CommonErrors.UserNotFound);
         }
 
-        var platforms = user.Platforms.Select(p => new PlatformRecord
+        var platforms = (user.Platforms ?? []).Select(p => new PlatformRecord
         {
             Id = p.Id,
             Name = p.Name,
@@ -189,5 +197,62 @@ public class UserService(IRepository<WebAppDatabaseContext> repository, ILoginSe
         }).ToList();
 
         return ServiceResponse.ForSuccess(platforms);
+    }
+
+    public async Task<ServiceResponse<List<PlatformRecord>>> ConnectPlatform(Guid platformId, UserRecord requestingUser, CancellationToken cancellationToken = default)
+    {
+        if (requestingUser.Role != UserRoleEnum.Artist)
+        {
+            return ServiceResponse.FromError<List<PlatformRecord>>(new(HttpStatusCode.Forbidden, "Only artists can connect platforms to their account!", ErrorCodes.CannotUpdate));
+        }
+
+        var user = await repository.GetAsync(new UserWithPlatformsSpec(requestingUser.Id), cancellationToken);
+        var platform = await repository.GetAsync(new PlatformSpec(platformId), cancellationToken);
+
+        if (user == null)
+            return ServiceResponse.FromError<List<PlatformRecord>>(CommonErrors.UserNotFound);
+
+        if (platform == null)
+            return ServiceResponse.FromError<List<PlatformRecord>>(CommonErrors.PlatformNotFound);
+
+        if (!user.Platforms.Any(existingPlatform => existingPlatform.Id == platformId))
+        {
+            user.Platforms.Add(platform);
+            await repository.DbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        return ServiceResponse.ForSuccess(user.Platforms.Select(connectedPlatform => new PlatformRecord
+        {
+            Id = connectedPlatform.Id,
+            Name = connectedPlatform.Name,
+            Url = connectedPlatform.Url
+        }).ToList());
+    }
+
+    public async Task<ServiceResponse<List<PlatformRecord>>> DisconnectPlatform(Guid platformId, UserRecord requestingUser, CancellationToken cancellationToken = default)
+    {
+        if (requestingUser.Role != UserRoleEnum.Artist)
+        {
+            return ServiceResponse.FromError<List<PlatformRecord>>(new(HttpStatusCode.Forbidden, "Only artists can disconnect platforms from their account!", ErrorCodes.CannotUpdate));
+        }
+
+        var user = await repository.GetAsync(new UserWithPlatformsSpec(requestingUser.Id), cancellationToken);
+
+        if (user == null)
+            return ServiceResponse.FromError<List<PlatformRecord>>(CommonErrors.UserNotFound);
+
+        var platform = user.Platforms.FirstOrDefault(existingPlatform => existingPlatform.Id == platformId);
+        if (platform != null)
+        {
+            user.Platforms.Remove(platform);
+            await repository.DbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        return ServiceResponse.ForSuccess(user.Platforms.Select(connectedPlatform => new PlatformRecord
+        {
+            Id = connectedPlatform.Id,
+            Name = connectedPlatform.Name,
+            Url = connectedPlatform.Url
+        }).ToList());
     }
 }

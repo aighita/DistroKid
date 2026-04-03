@@ -26,7 +26,8 @@ public class LoginService(IOptions<JwtConfiguration> jwtConfiguration) : ILoginS
             Claims = new Dictionary<string, object> // Add any other claims in the JWT, you can even add custom claims if you want.
             {
                 { ClaimTypes.Name, user.Name },
-                { ClaimTypes.Email, user.Email }
+                { ClaimTypes.Email, user.Email },
+                { ClaimTypes.Role, user.Role.ToString() } // Add the user's role claim so [Authorize(Roles = "Admin")] works correctly.
             },
             IssuedAt = issuedAt, // This sets the "iat" claim to indicate then the JWT was emitted.
             Expires = issuedAt.Add(expiresIn), // This sets the "exp" claim to indicate when the JWT expires and cannot be used.

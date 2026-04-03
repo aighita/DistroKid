@@ -11,9 +11,10 @@ namespace DistroKid.Services.Specifications;
 /// </summary>
 public sealed class EventProjectionSpec : Specification<Event, EventRecord>
 {
-    public EventProjectionSpec(bool orderByDate = false) =>
+    public EventProjectionSpec() =>
         Query
-            .OrderBy(e => e.Date, orderByDate)
+            .Include(e => e.Artist)
+            .OrderBy(e => e.Date)
             .Select(e => new EventRecord
             {
                 Id = e.Id,
@@ -31,9 +32,15 @@ public sealed class EventProjectionSpec : Specification<Event, EventRecord>
             });
 
     /// <summary>Used by GetEvents (pagination) — orders by date ascending and optionally filters by name.</summary>
-    public EventProjectionSpec(string? search) : this(true)
+    public EventProjectionSpec(string? search, IEnumerable<Guid>? artistIds = null) : this()
     {
         search = !string.IsNullOrWhiteSpace(search) ? search.Trim() : null;
+
+        if (artistIds != null)
+        {
+            var scopedArtistIds = artistIds.ToList();
+            Query.Where(e => scopedArtistIds.Contains(e.ArtistId));
+        }
 
         if (search == null)
         {

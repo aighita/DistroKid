@@ -63,6 +63,44 @@ namespace DistroKid.Database.Migrations
                     b.ToTable("Event");
                 });
 
+            modelBuilder.Entity("DistroKid.Database.Repository.Entities.Feedback", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsAnonymous")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Feedback");
+                });
+
             modelBuilder.Entity("DistroKid.Database.Repository.Entities.Label", b =>
                 {
                     b.Property<Guid>("Id")
@@ -324,6 +362,37 @@ namespace DistroKid.Database.Migrations
                     b.ToTable("UserFile");
                 });
 
+            modelBuilder.Entity("DistroKid.Database.Repository.Entities.UserProfile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Bio")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SocialMediaLink")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserProfile");
+                });
+
             modelBuilder.Entity("ReleasePlatform", b =>
                 {
                     b.Property<Guid>("PlatformsId")
@@ -363,6 +432,16 @@ namespace DistroKid.Database.Migrations
                         .IsRequired();
 
                     b.Navigation("Artist");
+                });
+
+            modelBuilder.Entity("DistroKid.Database.Repository.Entities.Feedback", b =>
+                {
+                    b.HasOne("DistroKid.Database.Repository.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DistroKid.Database.Repository.Entities.Merch", b =>
@@ -433,6 +512,17 @@ namespace DistroKid.Database.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("DistroKid.Database.Repository.Entities.UserProfile", b =>
+                {
+                    b.HasOne("DistroKid.Database.Repository.Entities.User", "User")
+                        .WithOne("Profile")
+                        .HasForeignKey("DistroKid.Database.Repository.Entities.UserProfile", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ReleasePlatform", b =>
                 {
                     b.HasOne("DistroKid.Database.Repository.Entities.Platform", null)
@@ -475,6 +565,8 @@ namespace DistroKid.Database.Migrations
             modelBuilder.Entity("DistroKid.Database.Repository.Entities.User", b =>
                 {
                     b.Navigation("Platforms");
+
+                    b.Navigation("Profile");
 
                     b.Navigation("UserFiles");
                 });

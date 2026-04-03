@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using DistroKid.Infrastructure.Requests;
 using DistroKid.Infrastructure.Responses;
 using DistroKid.Services.Abstractions;
 using DistroKid.Services.Authorization;
@@ -11,6 +13,17 @@ namespace DistroKid.Api.Controllers;
 public class FeedbackController(ILogger<FeedbackController> logger, IUserService userService, IFeedbackService feedbackService) : AuthorizedController(logger, userService)
 {
     private readonly IFeedbackService _feedbackService = feedbackService;
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    public async Task<ActionResult<RequestResponse<PagedResponse<FeedbackRecord>>>> GetPage([FromQuery] PaginationSearchQueryParams pagination)
+    {
+        var currentUser = await GetCurrentUser();
+
+        return currentUser.Result != null ?
+            FromServiceResponse(await _feedbackService.GetFeedbackPage(pagination)) :
+            ErrorMessageResult<PagedResponse<FeedbackRecord>>(currentUser.Error);
+    }
 
     [HttpPost]
     public async Task<ActionResult<RequestResponse>> Add([FromBody] FeedbackAddRecord feedback)

@@ -49,4 +49,12 @@ public interface IUserService
     /// GetUserPlatforms returns the platforms connected to a user.
     /// </summary>
     public Task<ServiceResponse<List<PlatformRecord>>> GetUserPlatforms(Guid userId, UserRecord? requestingUser = null, CancellationToken cancellationToken = default);
+    /// <summary>
+    /// Connect a platform to the current artist account.
+    /// </summary>
+    public Task<ServiceResponse<List<PlatformRecord>>> ConnectPlatform(Guid platformId, UserRecord requestingUser, CancellationToken cancellationToken = default);
+    /// <summary>
+    /// Disconnect a platform from the current artist account.
+    /// </summary>
+    public Task<ServiceResponse<List<PlatformRecord>>> DisconnectPlatform(Guid platformId, UserRecord requestingUser, CancellationToken cancellationToken = default);
 }

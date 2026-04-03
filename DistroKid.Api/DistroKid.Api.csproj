@@ -15,7 +15,7 @@
     <PackageReference Include="NextjsStaticHosting.AspNetCore" Version="0.9.3-preview" />
   </ItemGroup>
 
-  <Target Name="BuildNextJs" BeforeTargets="Build">
+  <Target Name="BuildNextJs" BeforeTargets="Build" Condition="'$(SkipNextJsBuild)' != 'true'">
     <Message Text="Building Next.js Client..." Importance="high" />
 
     <Exec Command="npm install" WorkingDirectory="../DistroKid.Client" />

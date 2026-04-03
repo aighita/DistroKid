@@ -16,23 +16,22 @@ import { mapValues } from '../runtime';
 import type { PlatformRecord } from './PlatformRecord';
 import {
     PlatformRecordFromJSON,
-    PlatformRecordFromJSONTyped,
     PlatformRecordToJSON,
-    PlatformRecordToJSONTyped,
 } from './PlatformRecord';
 import type { TrackRecord } from './TrackRecord';
 import {
     TrackRecordFromJSON,
-    TrackRecordFromJSONTyped,
     TrackRecordToJSON,
-    TrackRecordToJSONTyped,
 } from './TrackRecord';
+import type { UserRecord } from './UserRecord';
+import {
+    UserRecordFromJSON,
+    UserRecordToJSON,
+} from './UserRecord';
 import type { ReleaseTypeEnum } from './ReleaseTypeEnum';
 import {
     ReleaseTypeEnumFromJSON,
-    ReleaseTypeEnumFromJSONTyped,
     ReleaseTypeEnumToJSON,
-    ReleaseTypeEnumToJSONTyped,
 } from './ReleaseTypeEnum';
 
 /**
@@ -83,6 +82,12 @@ export interface ReleaseRecord {
      * @memberof ReleaseRecord
      */
     platforms: Array<PlatformRecord>;
+    /**
+     * 
+     * @type {UserRecord}
+     * @memberof ReleaseRecord
+     */
+    artist?: UserRecord | null;
 }
 
 
@@ -118,6 +123,7 @@ export function ReleaseRecordFromJSONTyped(json: any, ignoreDiscriminator: boole
         'releaseType': ReleaseTypeEnumFromJSON(json['releaseType']),
         'tracks': ((json['tracks'] as Array<any>).map(TrackRecordFromJSON)),
         'platforms': ((json['platforms'] as Array<any>).map(PlatformRecordFromJSON)),
+        'artist': json['artist'] == null ? undefined : UserRecordFromJSON(json['artist']),
     };
 }
 
@@ -139,6 +145,7 @@ export function ReleaseRecordToJSONTyped(value?: ReleaseRecord | null, ignoreDis
         'releaseType': ReleaseTypeEnumToJSON(value['releaseType']),
         'tracks': ((value['tracks'] as Array<any>).map(TrackRecordToJSON)),
         'platforms': ((value['platforms'] as Array<any>).map(PlatformRecordToJSON)),
+        'artist': value['artist'] == null ? value['artist'] : UserRecordToJSON(value['artist']),
     };
 }
 

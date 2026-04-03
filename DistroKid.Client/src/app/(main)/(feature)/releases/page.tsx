@@ -33,8 +33,8 @@ import {
 import { flexRender } from "@tanstack/react-table";
 import * as React from "react";
 import { useRelease } from "@/hooks/useRelease";
-import { getAllPlatforms } from "@/services/platform";
 import { getTracksPage } from "@/services/track";
+import { getCurrentUserPlatforms, getUserPlatformsById } from "@/services/user";
 import { useAuthStore } from "@/stores/authStore";
 import type { ReleaseRecord, PlatformRecord, TrackRecord } from "@/infrastructure/apis/client/models";
 import { ReleaseTypeEnum } from "@/infrastructure/apis/client/models";
@@ -71,6 +71,7 @@ function ReleaseForm({
 }) {
   const user = useAuthStore((s) => s.user);
   const isManager = user?.role === "Manager";
+  const canAssignPlatforms = user?.role !== "Admin";
 
   const [title, setTitle] = React.useState(initial?.title ?? "");
   const [label, setLabel] = React.useState(initial?.label ?? "");
@@ -82,7 +83,7 @@ function ReleaseForm({
       ? new Date(initial.releaseDate).toISOString().split("T")[0]
       : new Date().toISOString().split("T")[0],
   );
-  const [artistId, setArtistId] = React.useState("");
+  const [artistId, setArtistId] = React.useState(initial?.artist?.id ?? "");
   const [selectedTracks, setSelectedTracks] = React.useState<string[]>(
     initial?.tracks?.map((t) => t.id!) ?? [],
   );
@@ -92,16 +93,63 @@ function ReleaseForm({
   const [availableTracks, setAvailableTracks] = React.useState<TrackRecord[]>([]);
   const [availablePlatforms, setAvailablePlatforms] = React.useState<PlatformRecord[]>([]);
   const [err, setErr] = React.useState("");
+  const visibleTracks = React.useMemo(() => {
+    if (!isManager) {
+      return availableTracks;
+    }
+
+    if (!artistId) {
+      return [];
+    }
+
+    return availableTracks.filter((track) => track.artistId === artistId);
+  }, [artistId, availableTracks, isManager]);
 
   React.useEffect(() => {
     (async () => {
       try {
-        const [t, p] = await Promise.all([getTracksPage(1, 100), getAllPlatforms()]);
+        const t = await getTracksPage(1, 100);
         setAvailableTracks(t.data ?? []);
-        setAvailablePlatforms(p);
       } catch {}
     })();
   }, []);
+
+  React.useEffect(() => {
+    if (!canAssignPlatforms) {
+      setAvailablePlatforms([]);
+      setSelectedPlatforms([]);
+      return;
+    }
+
+    if (isManager && !artistId) {
+      setAvailablePlatforms([]);
+      setSelectedPlatforms([]);
+      return;
+    }
+
+    (async () => {
+      try {
+        const platforms = isManager
+          ? await getUserPlatformsById(artistId)
+          : await getCurrentUserPlatforms();
+
+        setAvailablePlatforms(platforms);
+        setSelectedPlatforms((current) =>
+          current.filter((platformId) => platforms.some((platform) => platform.id === platformId)),
+        );
+      } catch {
+        setAvailablePlatforms([]);
+      }
+    })();
+  }, [artistId, canAssignPlatforms, isManager]);
+
+  React.useEffect(() => {
+    if (!isManager) {
+      return;
+    }
+
+    setSelectedTracks((current) => current.filter((trackId) => visibleTracks.some((track) => track.id === trackId)));
+  }, [isManager, visibleTracks]);
 
   const toggleTrack = (id: string) =>
     setSelectedTracks((prev) =>
@@ -125,7 +173,7 @@ function ReleaseForm({
         releaseType,
         releaseDate: new Date(releaseDate),
         trackIds: selectedTracks,
-        platformIds: selectedPlatforms,
+        platformIds: canAssignPlatforms ? selectedPlatforms : [],
         artistId: isManager ? artistId || undefined : undefined,
       });
       onClose();
@@ -200,11 +248,11 @@ function ReleaseForm({
         )}
       </div>
 
-      {availableTracks.length > 0 && (
+      {visibleTracks.length > 0 && (
         <div className="flex flex-col gap-2">
           <label className="text-sm font-medium">Tracks</label>
           <div className="grid grid-cols-1 gap-1 max-h-32 overflow-y-auto border border-border rounded-lg p-2">
-            {availableTracks.map((t) => (
+            {visibleTracks.map((t) => (
               <label
                 key={t.id}
                 className="flex items-center gap-2 text-sm cursor-pointer hover:bg-muted/50 rounded px-2 py-1"
@@ -222,7 +270,11 @@ function ReleaseForm({
         </div>
       )}
 
-      {availablePlatforms.length > 0 && (
+      {isManager && !artistId && (
+        <p className="text-sm text-muted-foreground">Enter an artist ID to load that artist's tracks and connected platforms.</p>
+      )}
+
+      {canAssignPlatforms && availablePlatforms.length > 0 && (
         <div className="flex flex-col gap-2">
           <label className="text-sm font-medium">Platforms</label>
           <div className="grid grid-cols-2 gap-1 max-h-28 overflow-y-auto border border-border rounded-lg p-2">
@@ -244,6 +296,10 @@ function ReleaseForm({
         </div>
       )}
 
+      {canAssignPlatforms && isManager && !artistId && (
+        <p className="text-sm text-muted-foreground">Enter an artist ID to load that artist's connected platforms.</p>
+      )}
+
       <div className="flex gap-3 pt-2">
         <Button type="submit" className="flex-1" disabled={isLoading}>
           {isLoading ? "Saving…" : "Save"}
@@ -260,8 +316,8 @@ function ReleaseForm({
 
 export default function Releases() {
   const user = useAuthStore((s) => s.user);
-  const canEdit =
-    user?.role === "Artist" || user?.role === "Manager" || user?.role === "Admin";
+  const canEdit = user?.role === "Artist" || user?.role === "Manager";
+  const isAdmin = user?.role === "Admin";
 
   const {
     items,
@@ -284,7 +340,7 @@ export default function Releases() {
 
   React.useEffect(() => {
     fetchPage(1, "");
-  }, []);
+  }, [fetchPage]);
 
   const columns: ColumnDef<ReleaseRecord, unknown>[] = [
     {
@@ -311,6 +367,19 @@ export default function Releases() {
       header: ({ column }) => <DataTableColumnHeader column={column} title="Title" />,
       cell: ({ row }) => <div className="font-medium">{row.getValue("title")}</div>,
     },
+    ...(isAdmin
+      ? [
+          {
+            id: "artist",
+            header: ({ column }: { column: any }) => <DataTableColumnHeader column={column} title="Artist" />,
+            cell: ({ row }: { row: { original: ReleaseRecord } }) => (
+              <span className="text-muted-foreground text-sm">
+                {row.original.artist?.name || "-"}
+              </span>
+            ),
+          } as ColumnDef<ReleaseRecord, unknown>,
+        ]
+      : []),
     {
       accessorKey: "label",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Label" />,

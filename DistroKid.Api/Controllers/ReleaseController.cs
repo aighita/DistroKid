@@ -24,7 +24,7 @@ public class ReleaseController(ILogger<ReleaseController> logger, IUserService u
         var currentUser = await GetCurrentUser();
 
         return currentUser.Result != null ?
-            FromServiceResponse(await ReleaseService.GetReleaseById(id)) :
+            FromServiceResponse(await ReleaseService.GetReleaseById(id, currentUser.Result)) :
             ErrorMessageResult<ReleaseRecord>(currentUser.Error);
     }
 
@@ -35,7 +35,7 @@ public class ReleaseController(ILogger<ReleaseController> logger, IUserService u
         var currentUser = await GetCurrentUser();
 
         return currentUser.Result != null ?
-            FromServiceResponse(await ReleaseService.GetReleases(pagination)) :
+            FromServiceResponse(await ReleaseService.GetReleases(pagination, currentUser.Result)) :
             ErrorMessageResult<PagedResponse<ReleaseRecord>>(currentUser.Error);
     }
 

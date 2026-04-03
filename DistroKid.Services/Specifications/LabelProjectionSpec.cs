@@ -12,9 +12,9 @@ namespace DistroKid.Services.Specifications;
 /// </summary>
 public sealed class LabelProjectionSpec : Specification<Label, LabelRecord>
 {
-    public LabelProjectionSpec(bool orderByName = false) =>
+    public LabelProjectionSpec() =>
         Query
-            .OrderBy(l => l.Name, orderByName)
+            .OrderBy(l => l.Name)
             .Select(l => new LabelRecord
             {
                 Id = l.Id,
@@ -24,7 +24,7 @@ public sealed class LabelProjectionSpec : Specification<Label, LabelRecord>
             });
 
     /// <summary>Used by GetLabels (pagination) — orders by name and optionally filters by search.</summary>
-    public LabelProjectionSpec(string? search) : this(true)
+    public LabelProjectionSpec(string? search) : this()
     {
         search = !string.IsNullOrWhiteSpace(search) ? search.Trim() : null;
 
