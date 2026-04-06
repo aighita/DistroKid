@@ -15,7 +15,7 @@ public interface IUserFileService
     /// <summary>
     /// GetUserFiles gets the user files as pages from the database.
     /// </summary>
-    public Task<ServiceResponse<PagedResponse<UserFileRecord>>> GetUserFiles(PaginationSearchQueryParams pagination, CancellationToken cancellationToken = default);
+    public Task<ServiceResponse<PagedResponse<UserFileRecord>>> GetUserFiles(PaginationSearchQueryParams pagination, UserRecord requestingUser, CancellationToken cancellationToken = default);
     /// <summary>
     /// SaveFile saves a file on the file storage and also saves the path to the database for a requesting user.
     /// </summary>
@@ -23,5 +23,5 @@ public interface IUserFileService
     /// <summary>
     /// GetFileDownload gets a file stream for a given file found by the id in the database.
     /// </summary>
-    public Task<ServiceResponse<FileRecord>> GetFileDownload(Guid id, CancellationToken cancellationToken = default);
+    public Task<ServiceResponse<FileRecord>> GetFileDownload(Guid id, UserRecord requestingUser, CancellationToken cancellationToken = default);
 }

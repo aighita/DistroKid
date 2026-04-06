@@ -32,7 +32,7 @@ public class UserFileController(ILogger<UserFileController> logger, IUserService
         var currentUser = await GetCurrentUser();
 
         return currentUser.Result != null ?
-            FromServiceResponse(await userFileService.GetUserFiles(pagination)) :
+            FromServiceResponse(await userFileService.GetUserFiles(pagination, currentUser.Result)) :
             ErrorMessageResult<PagedResponse<UserFileRecord>>(currentUser.Error);
     }
 
@@ -69,7 +69,7 @@ public class UserFileController(ILogger<UserFileController> logger, IUserService
             return ErrorMessageResult<FileRecord>(currentUser.Error);
         }
 
-        var file = await userFileService.GetFileDownload(id);
+        var file = await userFileService.GetFileDownload(id, currentUser.Result);
 
         return FromServiceResponse(file);
     }

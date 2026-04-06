@@ -5,65 +5,76 @@ import { UserFileApi } from "@/infrastructure/apis/client";
 import { getApiConfig } from "@/lib/api";
 import { useAuthStore } from "@/stores/authStore";
 
-const AVATAR_FILE_ID_KEY = "userAvatarFileId";
+const AVATAR_FILE_ID_KEY_PREFIX = "userAvatarFileId:";
 const LEGACY_AVATAR_URL_KEY = "userAvatarUrl";
 const AVATAR_EVENT_NAME = "user-avatar-updated";
 
-function readStoredAvatarFileId(): string | null {
-  if (typeof window === "undefined") {
+function getAvatarStorageKey(userId: string) {
+  return `${AVATAR_FILE_ID_KEY_PREFIX}${userId}`;
+}
+
+function readStoredAvatarFileId(userId: string | null | undefined): string | null {
+  if (typeof window === "undefined" || !userId) {
     return null;
   }
 
-  const storedFileId = window.localStorage.getItem(AVATAR_FILE_ID_KEY);
+  const storedFileId = window.localStorage.getItem(getAvatarStorageKey(userId));
   if (storedFileId) {
     return storedFileId;
   }
 
-  const legacyUrl = window.localStorage.getItem(LEGACY_AVATAR_URL_KEY);
-  if (!legacyUrl) {
-    return null;
+  // Global legacy values can point to a different account's avatar.
+  // Remove them and let the hook refetch the current user's own file.
+  if (window.localStorage.getItem(LEGACY_AVATAR_URL_KEY)) {
+    window.localStorage.removeItem(LEGACY_AVATAR_URL_KEY);
   }
 
-  const match = legacyUrl.match(/\/api\/UserFile\/Download\/([^?]+)/);
-  if (!match) {
-    return null;
-  }
-
-  window.localStorage.setItem(AVATAR_FILE_ID_KEY, match[1]);
-  return match[1];
+  return null;
 }
 
-export function setStoredUserAvatarFileId(fileId: string | null) {
+export function setStoredUserAvatarFileId(fileId: string | null, userId?: string | null) {
   if (typeof window === "undefined") {
     return;
   }
 
-  if (fileId) {
-    window.localStorage.setItem(AVATAR_FILE_ID_KEY, fileId);
-  } else {
-    window.localStorage.removeItem(AVATAR_FILE_ID_KEY);
+  const resolvedUserId = userId ?? useAuthStore.getState().user?.id ?? null;
+  if (!resolvedUserId) {
+    return;
   }
 
-  window.dispatchEvent(new CustomEvent(AVATAR_EVENT_NAME, { detail: { fileId } }));
+  const storageKey = getAvatarStorageKey(resolvedUserId);
+
+  if (fileId) {
+    window.localStorage.setItem(storageKey, fileId);
+  } else {
+    window.localStorage.removeItem(storageKey);
+  }
+
+  window.dispatchEvent(new CustomEvent(AVATAR_EVENT_NAME, { detail: { fileId, userId: resolvedUserId } }));
 }
 
 export function useUserAvatar() {
   const token = useAuthStore((state) => state.token);
+  const userId = useAuthStore((state) => state.user?.id ?? null);
   const [avatarFileId, setAvatarFileId] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState("");
 
   useEffect(() => {
-    setAvatarFileId(readStoredAvatarFileId());
+    setAvatarFileId(readStoredAvatarFileId(userId));
 
     const handleStorage = (event: StorageEvent) => {
-      if (event.key === AVATAR_FILE_ID_KEY || event.key === LEGACY_AVATAR_URL_KEY) {
-        setAvatarFileId(readStoredAvatarFileId());
+      if (event.key === LEGACY_AVATAR_URL_KEY || event.key === (userId ? getAvatarStorageKey(userId) : null)) {
+        setAvatarFileId(readStoredAvatarFileId(userId));
       }
     };
 
     const handleAvatarUpdated = (event: Event) => {
-      const fileId = (event as CustomEvent<{ fileId?: string | null }>).detail?.fileId;
-      setAvatarFileId(fileId ?? readStoredAvatarFileId());
+      const detail = (event as CustomEvent<{ fileId?: string | null; userId?: string | null }>).detail;
+      if (detail?.userId && detail.userId !== userId) {
+        return;
+      }
+
+      setAvatarFileId(detail?.fileId ?? readStoredAvatarFileId(userId));
     };
 
     window.addEventListener("storage", handleStorage);
@@ -73,14 +84,14 @@ export function useUserAvatar() {
       window.removeEventListener("storage", handleStorage);
       window.removeEventListener(AVATAR_EVENT_NAME, handleAvatarUpdated as EventListener);
     };
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     let objectUrl: string | null = null;
     let cancelled = false;
 
     async function resolveAvatar() {
-      if (!token) {
+      if (!token || !userId) {
         if (!cancelled) {
           setAvatarUrl("");
         }
@@ -99,7 +110,7 @@ export function useUserAvatar() {
 
           resolvedFileId = profilePhotoFile?.id ?? null;
           if (resolvedFileId) {
-            setStoredUserAvatarFileId(resolvedFileId);
+            setStoredUserAvatarFileId(resolvedFileId, userId);
           }
         } catch {
           resolvedFileId = null;
@@ -143,7 +154,7 @@ export function useUserAvatar() {
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [avatarFileId, token]);
+  }, [avatarFileId, token, userId]);
 
   return avatarUrl;
 }

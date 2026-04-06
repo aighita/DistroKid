@@ -1,6 +1,7 @@
 ﻿﻿using System.Net;
 using DistroKid.Database.Repository;
 using DistroKid.Database.Repository.Entities;
+using DistroKid.Database.Repository.Enums;
 using DistroKid.Infrastructure.DataTransferObjects;
 using DistroKid.Infrastructure.Errors;
 using DistroKid.Infrastructure.Repositories.Interfaces;
@@ -23,9 +24,9 @@ public class UserFileService(IRepository<WebAppDatabaseContext> repository, IFil
     private static string GetFileDirectory(Guid userId) => Path.Join(userId.ToString(), IUserFileService.UserFilesDirectory);
 
 
-    public async Task<ServiceResponse<PagedResponse<UserFileRecord>>> GetUserFiles(PaginationSearchQueryParams pagination, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse<PagedResponse<UserFileRecord>>> GetUserFiles(PaginationSearchQueryParams pagination, UserRecord requestingUser, CancellationToken cancellationToken = default)
     {
-        var result = await repository.PageAsync(pagination, new UserFileProjectionSpec(pagination.Search), cancellationToken);
+        var result = await repository.PageAsync(pagination, new UserFileProjectionSpec(requestingUser.Id, pagination.Search), cancellationToken);
 
         return ServiceResponse.ForSuccess(result);
     }
@@ -50,12 +51,20 @@ public class UserFileService(IRepository<WebAppDatabaseContext> repository, IFil
         return ServiceResponse.ForSuccess();
     }
 
-    public async Task<ServiceResponse<FileRecord>> GetFileDownload(Guid id, CancellationToken cancellationToken = default) // If not successful respond with the error.
+    public async Task<ServiceResponse<FileRecord>> GetFileDownload(Guid id, UserRecord requestingUser, CancellationToken cancellationToken = default) // If not successful respond with the error.
     {
         var userFile = await repository.GetAsync<UserFile>(id, cancellationToken); // First get the file entity from the database to find the location on the filesystem.
 
-        return userFile != null ? 
-            fileRepository.GetFile(Path.Join(GetFileDirectory(userFile.UserId), userFile.Path), userFile.Name) : 
-            ServiceResponse.FromError<FileRecord>(new(HttpStatusCode.NotFound, "File entry not found!", ErrorCodes.EntityNotFound));
+        if (userFile == null)
+        {
+            return ServiceResponse.FromError<FileRecord>(new(HttpStatusCode.NotFound, "File entry not found!", ErrorCodes.EntityNotFound));
+        }
+
+        if (requestingUser.Role != UserRoleEnum.Admin && userFile.UserId != requestingUser.Id)
+        {
+            return ServiceResponse.FromError<FileRecord>(new(HttpStatusCode.Forbidden, "You cannot access this file!", ErrorCodes.CannotRead));
+        }
+
+        return fileRepository.GetFile(Path.Join(GetFileDirectory(userFile.UserId), userFile.Path), userFile.Name);
     }
 }
