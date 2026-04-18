@@ -20,13 +20,13 @@ export default function AuthGuard({
   useEffect(() => {
     if (!mounted || isLoading) return;
 
-    // If user is logged in, redirect to dashboard
+    
     if (user) {
       router.replace("/");
     }
   }, [user, isLoading, mounted, router]);
 
-  // Show nothing while checking authentication or redirecting
+  
   if (!mounted || isLoading || user) {
     return null;
   }

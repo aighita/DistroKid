@@ -3,13 +3,13 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import type { UserRecord } from '@/lib/openapi/models';
 
 export interface AuthState {
-  // State
+  
   user: UserRecord | null;
   token: string | null;
   isAuthenticated: boolean;
   isHydrated: boolean;
   
-  // Actions
+  
   login: (token: string, user: UserRecord) => void;
   logout: () => void;
   setHydrated: (hydrated: boolean) => void;
@@ -20,13 +20,13 @@ export interface AuthState {
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      // Initial state
+      
       user: null,
       token: null,
       isAuthenticated: false,
       isHydrated: false,
 
-      // Actions
+      
       login: (token, user) =>
         set({
           token,

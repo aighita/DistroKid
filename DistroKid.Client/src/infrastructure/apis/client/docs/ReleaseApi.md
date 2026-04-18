@@ -30,13 +30,11 @@ import type { ApiReleaseAddPostRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new ReleaseApi(config);
 
   const body = {
-    // ReleaseAddRecord (optional)
     releaseAddRecord: ...,
   } satisfies ApiReleaseAddPostRequest;
 
@@ -47,8 +45,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 
@@ -99,13 +95,11 @@ import type { ApiReleaseDeleteIdDeleteRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new ReleaseApi(config);
 
   const body = {
-    // string
     id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
   } satisfies ApiReleaseDeleteIdDeleteRequest;
 
@@ -116,8 +110,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 
@@ -168,13 +160,11 @@ import type { ApiReleaseGetByIdIdGetRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new ReleaseApi(config);
 
   const body = {
-    // string
     id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
   } satisfies ApiReleaseGetByIdIdGetRequest;
 
@@ -185,8 +175,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 
@@ -237,17 +225,13 @@ import type { ApiReleaseGetPageGetRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new ReleaseApi(config);
 
   const body = {
-    // string (optional)
     search: search_example,
-    // number (optional)
     page: 56,
-    // number (optional)
     pageSize: 56,
   } satisfies ApiReleaseGetPageGetRequest;
 
@@ -258,8 +242,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 
@@ -312,15 +294,12 @@ import type { ApiReleaseUpdateIdPutRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new ReleaseApi(config);
 
   const body = {
-    // string
     id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
-    // ReleaseUpdateRecord (optional)
     releaseUpdateRecord: ...,
   } satisfies ApiReleaseUpdateIdPutRequest;
 
@@ -331,8 +310,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 

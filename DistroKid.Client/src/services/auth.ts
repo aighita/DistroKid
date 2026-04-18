@@ -6,7 +6,7 @@ function getApi() {
   return new AuthorizationApi(getApiConfig());
 }
 
-/** Login with email and password. Returns { token, user }. */
+
 export async function login(email: string, password: string) {
   const loginData: LoginRecord = { email, password };
   const response = await getApi().apiAuthorizationLoginPost({ loginRecord: loginData });
@@ -15,10 +15,10 @@ export async function login(email: string, password: string) {
     throw new Error(response.errorMessage.message ?? "Login failed");
   }
   if (!response.response) throw new Error("No response from server");
-  return response.response; // { token, user }
+  return response.response; 
 }
 
-/** Register a new user. Returns { token, user }. */
+
 export async function register(
   name: string,
   email: string,
@@ -44,6 +44,6 @@ export async function register(
     throw new Error(response.errorMessage.message ?? "Registration failed");
   }
   if (!response.response) throw new Error("No response from server");
-  return response.response; // { token, user }
+  return response.response; 
 }
 

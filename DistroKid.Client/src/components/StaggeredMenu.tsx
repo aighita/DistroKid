@@ -4,7 +4,7 @@ import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-// import Image from 'next/image';
+
 
 import {
   Avatar,
@@ -163,7 +163,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
     const tl = gsap.timeline({ paused: true });
 
-    // Animate main content margin starting at the same time as the first pre-layer
+    
     if (contentRef?.current) {
       const marginProp = position === 'right' ? 'marginRight' : 'marginLeft';
       tl.to(contentRef.current, {
@@ -248,7 +248,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   }, [buildOpenTimeline]);
 
   const playClose = useCallback(() => {
-    // Capture current margin before killing the open timeline
+    
     let currentMargin = '0px';
     if (contentRef?.current) {
       const marginProp = position === 'right' ? 'marginRight' : 'marginLeft';
@@ -259,7 +259,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     openTlRef.current = null;
     itemEntranceTweenRef.current?.kill();
 
-    // Re-apply captured margin so it doesn't snap after timeline kill
+    
     if (contentRef?.current) {
       const marginProp = position === 'right' ? 'marginRight' : 'marginLeft';
       gsap.set(contentRef.current, { [marginProp]: currentMargin });
@@ -280,7 +280,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       ease: 'power3.in',
       overwrite: 'auto',
       onStart: () => {
-        // Animate content margin back to 0 in sync with close
+        
         if (contentRef?.current) {
           const marginProp = position === 'right' ? 'marginRight' : 'marginLeft';
           gsap.to(contentRef.current, {
@@ -324,7 +324,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     spinTweenRef.current?.kill();
 
     if (opening) {
-      // ensure container never rotates
+      
       gsap.set(icon, { rotate: 0, transformOrigin: '50% 50%' });
       spinTweenRef.current = gsap
         .timeline({ defaults: { ease: 'power4.out' } })
@@ -344,7 +344,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       const btn = toggleBtnRef.current;
       if (!btn) return;
       colorTweenRef.current?.kill();
-      // Always use black text for white theme
+      
       const targetColor = '#000000';
       colorTweenRef.current = gsap.to(btn, { color: targetColor, duration: 0.3, ease: 'power2.out' });
     },
@@ -639,22 +639,22 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
               )}
             </ul>
 
-            {/* <div className="sm-secondary-links mt-4 flex flex-col gap-3">
-              <a
-                href="/upload"
-                onClick={(e) => { e.preventDefault(); navigateWithClose('/upload'); }}
-                className="text-xs font-black tracking-[0.2em] text-zinc-500 hover:text-[#0088FF] transition-colors"
-              >
-                Upload Music
-              </a>
-              <a
-                href="/analytics"
-                onClick={(e) => { e.preventDefault(); navigateWithClose('/analytics'); }}
-                className="text-xs font-black tracking-[0.2em] text-zinc-500 hover:text-[#0088FF] transition-colors"
-              >
-                Analytics
-              </a>
-            </div> */}
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             {workingHours && workingHours.length > 0 && (
               <div className="sm-hours mt-4 flex flex-col gap-2">

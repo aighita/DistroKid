@@ -4,10 +4,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
-/**
- * Example 1: UserProfile Component
- * Shows user information and logout button
- */
+
+
+
+
 export function UserProfile() {
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuth();
@@ -34,9 +34,9 @@ export function UserProfile() {
   );
 }
 
-/**
- * Example 2: useAuth Hook in any component
- */
+
+
+
 export function AuthStatus() {
   const { isAuthenticated, user } = useAuth();
 
@@ -55,9 +55,9 @@ export function AuthStatus() {
   );
 }
 
-/**
- * Example 3: Conditional rendering based on auth state
- */
+
+
+
 export function DashboardPreview() {
   const { isAuthenticated, user } = useAuth();
 

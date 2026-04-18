@@ -40,7 +40,7 @@ import type { ReleaseRecord, PlatformRecord, TrackRecord } from "@/infrastructur
 import { ReleaseTypeEnum } from "@/infrastructure/apis/client/models";
 import { Pencil, Trash2, Plus, ChevronDown, ChevronUp } from "lucide-react";
 
-// ── Helpers ────────────────────────────────────────────────────────────────
+
 
 const TYPE_BADGE: Record<string, string> = {
   Single: "bg-blue-100 text-blue-700 border-blue-200",
@@ -48,7 +48,7 @@ const TYPE_BADGE: Record<string, string> = {
   Album: "bg-green-100 text-green-700 border-green-200",
 };
 
-// ── Release Form ───────────────────────────────────────────────────────────
+
 
 function ReleaseForm({
   initial,
@@ -312,7 +312,7 @@ function ReleaseForm({
   );
 }
 
-// ── Page ───────────────────────────────────────────────────────────────────
+
 
 export default function Releases() {
   const user = useAuthStore((s) => s.user);
@@ -446,7 +446,7 @@ export default function Releases() {
 
   return (
     <div className="min-h-screen bg-background text-foreground px-6 py-12 md:px-16 lg:px-24">
-      {/* Header */}
+      
       <div className="flex items-center justify-between mb-10">
         <div>
           <h1 className="text-4xl font-bold tracking-tight">Releases</h1>
@@ -497,7 +497,7 @@ export default function Releases() {
         </div>
       )}
 
-      {/* Table */}
+      
       <div className="overflow-hidden rounded-xl border border-border">
         <Table>
           <TableHeader>
@@ -589,7 +589,7 @@ export default function Releases() {
         </Table>
       </div>
 
-      {/* Pagination */}
+      
       <div className="flex items-center justify-between mt-4">
         <p className="text-sm text-muted-foreground">
           Page {page} of {pageCount}
@@ -614,7 +614,7 @@ export default function Releases() {
         </div>
       </div>
 
-      {/* Edit dialog */}
+      
       {editItem && (
         <Dialog open={!!editItem} onOpenChange={(o) => !o && setEditItem(null)}>
           <DialogContent className="sm:max-w-lg">
@@ -637,7 +637,7 @@ export default function Releases() {
           </DialogContent>
         </Dialog>
       )}
-      {/* Delete dialog */}
+      
       <AlertDialog open={!!deleteItem} onOpenChange={(o) => !o && setDeleteItem(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

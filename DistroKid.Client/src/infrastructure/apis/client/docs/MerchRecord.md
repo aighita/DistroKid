@@ -17,8 +17,6 @@ Name | Type
 
 ```typescript
 import type { MerchRecord } from ''
-
-// TODO: Update the object below with actual values
 const example = {
   "id": null,
   "name": null,
@@ -29,12 +27,8 @@ const example = {
 } satisfies MerchRecord
 
 console.log(example)
-
-// Convert the instance to a JSON string
 const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
-
-// Parse the JSON string back to an object
 const exampleParsed = JSON.parse(exampleJSON) as MerchRecord
 console.log(exampleParsed)
 ```

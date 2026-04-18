@@ -27,10 +27,6 @@ async function authorizedFetch<T>(path: string, init?: RequestInit): Promise<T> 
     return payload.response as T;
 }
 
-/**
- * Service to fetch paginated users from the API.
- * Only accessible by administrators.
- */
 export async function getUsersPage(page: number, pageSize: number, search?: string) {
     const api = new UserApi(getApiConfig());
     const response = await api.apiUserGetPageGet({
@@ -46,9 +42,6 @@ export async function getUsersPage(page: number, pageSize: number, search?: stri
     return response.response;
 }
 
-/**
- * Service to update a user.
- */
 export async function updateUser(user: UserUpdateRecord) {
     const api = new UserApi(getApiConfig());
     const response = await api.apiUserUpdatePut({ userUpdateRecord: user });
@@ -60,9 +53,6 @@ export async function updateUser(user: UserUpdateRecord) {
     return response;
 }
 
-/**
- * Service to delete a user.
- */
 export async function deleteUser(id: string) {
     const api = new UserApi(getApiConfig());
     const response = await api.apiUserDeleteIdDelete({ id });

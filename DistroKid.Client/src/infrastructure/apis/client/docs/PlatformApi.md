@@ -30,13 +30,11 @@ import type { ApiPlatformAddPostRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new PlatformApi(config);
 
   const body = {
-    // PlatformAddRecord (optional)
     platformAddRecord: ...,
   } satisfies ApiPlatformAddPostRequest;
 
@@ -47,8 +45,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 
@@ -99,13 +95,11 @@ import type { ApiPlatformDeleteIdDeleteRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new PlatformApi(config);
 
   const body = {
-    // string
     id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
   } satisfies ApiPlatformDeleteIdDeleteRequest;
 
@@ -116,8 +110,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 
@@ -168,7 +160,6 @@ import type { ApiPlatformGetAllGetRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new PlatformApi(config);
@@ -180,8 +171,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 
@@ -229,13 +218,11 @@ import type { ApiPlatformGetByIdIdGetRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new PlatformApi(config);
 
   const body = {
-    // string
     id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
   } satisfies ApiPlatformGetByIdIdGetRequest;
 
@@ -246,8 +233,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 
@@ -298,15 +283,12 @@ import type { ApiPlatformUpdateIdPutRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new PlatformApi(config);
 
   const body = {
-    // string
     id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
-    // PlatformUpdateRecord (optional)
     platformUpdateRecord: ...,
   } satisfies ApiPlatformUpdateIdPutRequest;
 
@@ -317,8 +299,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 

@@ -1,8 +1,17 @@
 "use client";
 
+import Image from 'next/image';
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { gsap } from 'gsap';
+import {
+  Album,
+  CalendarRange,
+  CloudUpload,
+  Library,
+  MessageSquareQuote,
+  RadioTower
+} from 'lucide-react';
 
 export interface BentoCardProps {
   color?: string;
@@ -10,6 +19,9 @@ export interface BentoCardProps {
   description?: string;
   label?: string;
   href?: string;
+  imageSrc?: string;
+  imageAlt?: string;
+  icon?: React.ComponentType<{ className?: string }>;
   textAutoHide?: boolean;
   disableAnimations?: boolean;
 }
@@ -39,42 +51,48 @@ const cardData: BentoCardProps[] = [
     title: 'Upload Music',
     description: 'Distribute your music to the world',
     label: 'Upload',
-    href: '/upload'
+    href: '/upload',
+    icon: CloudUpload
   },
   {
     color: '#ffffff',
     title: 'Platforms',
     description: 'Connect and manage streaming services',
     label: 'Distribution',
-    href: '/platforms'
+    href: '/platforms',
+    icon: RadioTower
   },
   {
     color: '#ffffff',
     title: 'Merch & Events',
     description: 'Sell merchandise and promote events',
     label: 'Commerce',
-    href: '/merch-and-events'
+    href: '/merch-and-events',
+    icon: CalendarRange
   },
   {
     color: '#ffffff',
     title: 'Releases',
     description: 'Manage your tracks, albums, and singles',
     label: 'Music',
-    href: '/releases'
+    href: '/releases',
+    icon: Album
   },
   {
     color: '#ffffff',
     title: 'Tracks',
     description: 'Browse and manage individual tracks',
     label: 'Library',
-    href: '/tracks'
+    href: '/tracks',
+    icon: Library
   },
   {
     color: '#ffffff',
     title: 'Feedback',
     description: 'Send us your thoughts and suggestions',
     label: 'Feedback',
-    href: '/feedback'
+    href: '/feedback',
+    icon: MessageSquareQuote
   }
 ];
 
@@ -530,6 +548,30 @@ const useMobileDetection = () => {
   return isMobile;
 };
 
+const BentoCardVisual: React.FC<{ card: BentoCardProps }> = ({ card }) => {
+  const Icon = card.icon;
+
+  return (
+    <div className="pointer-events-none flex flex-1 items-center justify-center py-4">
+      {card.imageSrc ? (
+        <div className="relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-3xl border border-black/10 bg-black/[0.04] shadow-[0_18px_40px_rgba(0,0,0,0.08)]">
+          <Image
+            src={card.imageSrc}
+            alt={card.imageAlt ?? card.title ?? 'Card visual'}
+            fill
+            className="object-cover"
+            sizes="96px"
+          />
+        </div>
+      ) : Icon ? (
+        <div className="flex h-24 w-24 items-center justify-center rounded-3xl border border-black/10 bg-gradient-to-br from-neutral-100 via-white to-neutral-200 shadow-[0_18px_40px_rgba(0,0,0,0.08)]">
+          <Icon className="h-10 w-10 text-neutral-900" />
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
 const MagicBento: React.FC<BentoProps> = ({
   textAutoHide = true,
   enableStars = true,
@@ -724,6 +766,7 @@ const MagicBento: React.FC<BentoProps> = ({
                   <div className="card__header flex justify-between gap-3 relative text-neutral-900">
                     <span className="card__label text-base">{card.label}</span>
                   </div>
+                  <BentoCardVisual card={card} />
                   <div className="card__content flex flex-col relative text-neutral-900">
                     <h3 className={`card__title font-normal text-base m-0 mb-1 ${textAutoHide ? 'text-clamp-1' : ''}`}>
                       {card.title}
@@ -858,6 +901,7 @@ const MagicBento: React.FC<BentoProps> = ({
                 <div className="card__header flex justify-between gap-3 relative text-neutral-900">
                   <span className="card__label text-base">{card.label}</span>
                 </div>
+                <BentoCardVisual card={card} />
                 <div className="card__content flex flex-col relative text-neutral-900">
                   <h3 className={`card__title font-normal text-base m-0 mb-1 ${textAutoHide ? 'text-clamp-1' : ''}`}>
                     {card.title}

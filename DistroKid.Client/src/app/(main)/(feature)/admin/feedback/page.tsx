@@ -98,7 +98,7 @@ export default function FeedbackAdminPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground px-6 py-12 md:px-16 lg:px-24">
-      {/* Header */}
+      
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
         <div>
           <h1 className="text-4xl font-bold tracking-tight">System Feedback</h1>
@@ -122,7 +122,7 @@ export default function FeedbackAdminPage() {
         </div>
       )}
 
-      {/* Table */}
+      
       <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
         <Table>
           <TableHeader>
@@ -170,7 +170,7 @@ export default function FeedbackAdminPage() {
         </Table>
       </div>
 
-      {/* Pagination */}
+      
       <div className="flex items-center justify-between mt-6">
         <p className="text-sm text-muted-foreground font-medium">
           Page {page} of {pageCount}

@@ -104,7 +104,7 @@ export default function UsersAdminPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground px-6 py-12 md:px-16 lg:px-24">
-      {/* Header */}
+      
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
         <div>
           <h1 className="text-4xl font-bold tracking-tight">System Users</h1>
@@ -126,7 +126,7 @@ export default function UsersAdminPage() {
         </div>
       )}
 
-      {/* Table */}
+      
       <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
         <Table>
           <TableHeader>
@@ -171,7 +171,7 @@ export default function UsersAdminPage() {
         </Table>
       </div>
 
-      {/* Pagination */}
+      
       <div className="flex items-center justify-between mt-6">
         <p className="text-sm text-muted-foreground font-medium">
           Page {page} of {pageCount}
@@ -198,7 +198,7 @@ export default function UsersAdminPage() {
         </div>
       </div>
 
-      {/* Edit Dialog */}
+      
       <AlertDialog open={!!editItem} onOpenChange={(o) => !o && setEditItem(null)}>
         <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
@@ -238,7 +238,7 @@ export default function UsersAdminPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Delete Confirmation */}
+      
       <AlertDialog open={!!deleteItem} onOpenChange={(o) => !o && setDeleteItem(null)}>
         <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>

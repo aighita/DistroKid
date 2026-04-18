@@ -37,15 +37,11 @@ import { useAuthStore } from "@/stores/authStore";
 import type { TrackRecord } from "@/infrastructure/apis/client/models";
 import { Pencil, Trash2, Plus } from "lucide-react";
 
-// â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
-
-// â”€â”€ Track Form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function TrackForm({
   initial,
@@ -102,7 +98,7 @@ function TrackForm({
       </div>
       <div className="flex gap-3 pt-2">
         <Button type="submit" className="flex-1" disabled={isLoading}>
-          {isLoading ? "Savingâ€¦" : "Save"}
+          {isLoading ? "Saving" : "Save"}
         </Button>
         <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
           Cancel
@@ -111,8 +107,6 @@ function TrackForm({
     </form>
   );
 }
-
-// â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function Tracks() {
   const router = useRouter();
@@ -232,7 +226,7 @@ export default function Tracks() {
 
   return (
     <div className="min-h-screen bg-background text-foreground px-6 py-12 md:px-16 lg:px-24">
-      {/* Header */}
+      
       <div className="flex items-center justify-between mb-10">
         <div>
           <h1 className="text-4xl font-bold tracking-tight">Tracks</h1>
@@ -241,7 +235,7 @@ export default function Tracks() {
         <div className="flex gap-3 items-center">
           <input
             className="rounded-full bg-background border border-border px-4 py-2 text-sm outline-none focus:border-[#5227FF] placeholder-muted-foreground"
-            placeholder="Search tracksâ€¦"
+            placeholder="Search tracks"
             value={searchInput}
             onChange={handleSearch}
           />
@@ -273,7 +267,7 @@ export default function Tracks() {
         </div>
       )}
 
-      {/* Table */}
+      
       <div className="overflow-hidden rounded-xl border border-border">
         <Table>
           <TableHeader>
@@ -291,7 +285,7 @@ export default function Tracks() {
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
-                  Loadingâ€¦
+                  Loading
                 </TableCell>
               </TableRow>
             ) : table.getRowModel().rows.length ? (
@@ -315,7 +309,7 @@ export default function Tracks() {
         </Table>
       </div>
 
-      {/* Pagination */}
+      
       <div className="flex items-center justify-between mt-4">
         <p className="text-sm text-muted-foreground">
           Page {page} of {pageCount}
@@ -330,7 +324,7 @@ export default function Tracks() {
         </div>
       </div>
 
-      {/* Edit dialog */}
+      
       {editItem && (
         <Dialog open={!!editItem} onOpenChange={(o) => !o && setEditItem(null)}>
           <DialogContent>
@@ -349,7 +343,7 @@ export default function Tracks() {
           </DialogContent>
         </Dialog>
       )}
-      {/* Delete dialog */}
+      
       <AlertDialog open={!!deleteItem} onOpenChange={(o) => !o && setDeleteItem(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

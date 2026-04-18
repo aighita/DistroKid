@@ -4,9 +4,9 @@ import { useState, useCallback, useEffect } from "react";
 import type { UserRecord } from "@/infrastructure/apis/client/models";
 import { getUsersPage, deleteUser, updateUser } from "@/services/user";
 
-/**
- * Custom hook for managing the list of users in the administration dashboard.
- */
+
+
+
 export function useUser() {
   const [items, setItems] = useState<UserRecord[]>([]);
   const [totalCount, setTotalCount] = useState(0);

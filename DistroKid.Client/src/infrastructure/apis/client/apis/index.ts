@@ -1,5 +1,5 @@
-/* tslint:disable */
-/* eslint-disable */
+
+
 export * from './AuthorizationApi';
 export * from './EventApi';
 export * from './FeedbackApi';

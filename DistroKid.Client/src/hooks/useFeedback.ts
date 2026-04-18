@@ -4,9 +4,9 @@ import { useState, useCallback, useEffect } from "react";
 import type { FeedbackRecord } from "@/infrastructure/apis/client/models";
 import { getFeedbackPage } from "@/services/feedback";
 
-/**
- * Custom hook for managing the list of feedback entries in the administration dashboard.
- */
+
+
+
 export function useFeedback() {
   const [items, setItems] = useState<FeedbackRecord[]>([]);
   const [totalCount, setTotalCount] = useState(0);

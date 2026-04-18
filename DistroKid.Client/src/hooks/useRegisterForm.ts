@@ -39,7 +39,7 @@ export function useRegisterForm() {
         setError("");
         setIsLoading(true);
 
-        // Validation
+        
         if (formData.password !== formData.confirmPassword) {
             setError("Passwords do not match");
             setIsLoading(false);

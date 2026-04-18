@@ -27,13 +27,11 @@ import type { ApiAuthorizationLoginPostRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new AuthorizationApi(config);
 
   const body = {
-    // LoginRecord (optional)
     loginRecord: ...,
   } satisfies ApiAuthorizationLoginPostRequest;
 
@@ -44,8 +42,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 
@@ -96,13 +92,11 @@ import type { ApiAuthorizationRegisterPostRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new AuthorizationApi(config);
 
   const body = {
-    // RegisterRecord (optional)
     registerRecord: ...,
   } satisfies ApiAuthorizationRegisterPostRequest;
 
@@ -113,8 +107,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 

@@ -28,15 +28,12 @@ import type { ApiUserFileAddPostRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new UserFileApi(config);
 
   const body = {
-    // Blob (optional)
     file: BINARY_DATA_HERE,
-    // string (optional)
     description: description_example,
   } satisfies ApiUserFileAddPostRequest;
 
@@ -47,8 +44,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 
@@ -100,13 +95,11 @@ import type { ApiUserFileDownloadIdGetRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new UserFileApi(config);
 
   const body = {
-    // string
     id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
   } satisfies ApiUserFileDownloadIdGetRequest;
 
@@ -117,8 +110,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 
@@ -131,7 +122,6 @@ example().catch(console.error);
 
 ### Return type
 
-**Blob**
 
 ### Authorization
 
@@ -169,17 +159,13 @@ import type { ApiUserFileGetPageGetRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new UserFileApi(config);
 
   const body = {
-    // string (optional)
     search: search_example,
-    // number (optional)
     page: 56,
-    // number (optional)
     pageSize: 56,
   } satisfies ApiUserFileGetPageGetRequest;
 
@@ -190,8 +176,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 

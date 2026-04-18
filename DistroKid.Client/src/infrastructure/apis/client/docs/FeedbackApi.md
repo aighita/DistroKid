@@ -27,13 +27,11 @@ import type { ApiFeedbackAddPostRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new FeedbackApi(config);
 
   const body = {
-    // FeedbackAddRecord (optional)
     feedbackAddRecord: ...,
   } satisfies ApiFeedbackAddPostRequest;
 
@@ -44,8 +42,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 
@@ -96,17 +92,13 @@ import type { ApiFeedbackGetPageGetRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new FeedbackApi(config);
 
   const body = {
-    // string (optional)
     search: search_example,
-    // number (optional)
     page: 56,
-    // number (optional)
     pageSize: 56,
   } satisfies ApiFeedbackGetPageGetRequest;
 
@@ -117,8 +109,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 

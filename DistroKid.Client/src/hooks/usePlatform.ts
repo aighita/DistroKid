@@ -14,26 +14,26 @@ export function usePlatform() {
         }
     };
 
-    // const fetchPlatformById = async (id: string) => {
-    //     try {
-    //         const platform = await getPlatformById(id);
-    //         return platform;
-    //     } catch (error) {
-    //         console.error(`Error fetching platform with id ${id}:`, error);
-    //         return null;
-    //     }
-    // };
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
-    // const createPlatform = async (name: string, url: string) => {
-    //     try {
-    //         const newPlatform = await addPlatform(name, url);
-    //         setPlatforms((prev) => [...prev, newPlatform]);
-    //         return newPlatform;
-    //     } catch (error) {
-    //         console.error('Error creating platform:', error);
-    //         return null;
-    //     }
-    // };
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     return {
         platforms,

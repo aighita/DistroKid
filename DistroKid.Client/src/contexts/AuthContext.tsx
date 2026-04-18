@@ -18,10 +18,10 @@ export interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
-/**
- * Hook to use authentication context
- * Must be called within AuthProvider
- */
+
+
+
+
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
@@ -30,22 +30,22 @@ export function useAuth() {
   return context;
 }
 
-/**
- * Provider component that wraps your app
- * Manages authentication state and hydration
- */
+
+
+
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
   const [isValidatingSession, setIsValidatingSession] = useState(false);
 
-  // Get values from Zustand
+  
   const user = useAuthStore((state) => state.user);
   const token = useAuthStore((state) => state.token);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const login = useAuthStore((state) => state.login);
   const logout = useAuthStore((state) => state.logout);
 
-  // Wait for client mount to prevent hydration mismatch
+  
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -94,8 +94,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [mounted, logout, token, user?.id]);
 
-  // Don't block rendering - just provide context once mounted
-  // This allows public pages (login/register) to render immediately
+  
+  
   return (
     <AuthContext.Provider
       value={{

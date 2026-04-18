@@ -68,7 +68,7 @@ export default function Platforms() {
 
   return (
     <div className="min-h-screen bg-background text-foreground px-6 py-12 md:px-16 lg:px-24">
-      {/* Header */}
+      
       <div className="mb-12">
         <h1 className="text-4xl font-bold tracking-tight">Platforms</h1>
         <p className="text-muted-foreground mt-2">Manage your music distribution across streaming platforms</p>
@@ -80,7 +80,7 @@ export default function Platforms() {
         </div>
       )}
 
-      {/* Platforms Grid */}
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading ? (
           <div className="col-span-full flex items-center justify-center py-20">

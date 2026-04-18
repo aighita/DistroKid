@@ -1,5 +1,5 @@
-/* tslint:disable */
-/* eslint-disable */
+
+
 export * from './ErrorCodes';
 export * from './ErrorMessage';
 export * from './EventAddRecord';

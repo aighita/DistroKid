@@ -27,7 +27,7 @@ import { useAuthStore } from "@/stores/authStore";
 import type { MerchRecord, EventRecord } from "@/infrastructure/apis/client/models";
 import { Pencil, Trash2, Plus } from "lucide-react";
 
-// â”€â”€ Merch form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
 
 function MerchForm({
   initial,
@@ -96,7 +96,7 @@ function MerchForm({
       </div>
       <div className="flex gap-3 pt-2">
         <Button type="submit" className="flex-1" disabled={isLoading}>
-          {isLoading ? "Savingâ€¦" : "Save"}
+          {isLoading ? "Saving" : "Save"}
         </Button>
         <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
           Cancel
@@ -106,7 +106,7 @@ function MerchForm({
   );
 }
 
-// â”€â”€ Event form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
 
 function EventForm({
   initial,
@@ -175,7 +175,7 @@ function EventForm({
       </div>
       <div className="flex gap-3 pt-2">
         <Button type="submit" className="flex-1" disabled={isLoading}>
-          {isLoading ? "Savingâ€¦" : "Save"}
+          {isLoading ? "Saving" : "Save"}
         </Button>
         <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
           Cancel
@@ -185,14 +185,14 @@ function EventForm({
   );
 }
 
-// â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
 
 export default function MerchAndEvents() {
   const user = useAuthStore((s) => s.user);
   const canEdit = user?.role === "Artist" || user?.role === "Admin";
   const isAdmin = user?.role === "Admin";
 
-  // â”€â”€ Merch state â”€â”€
+  
   const {
     items: merch,
     page: mPage,
@@ -210,7 +210,7 @@ export default function MerchAndEvents() {
   const [mActionLoading, setMActionLoading] = React.useState(false);
   const [mSearch, setMSearch] = React.useState("");
 
-  // â”€â”€ Event state â”€â”€
+  
   const {
     items: events,
     page: ePage,
@@ -233,7 +233,7 @@ export default function MerchAndEvents() {
     eFetch(1, "");
   }, [eFetch, mFetch]);
 
-  // â”€â”€ Merch columns â”€â”€
+  
   const merchColumns: ColumnDef<MerchRecord, unknown>[] = [
     {
       accessorKey: "name",
@@ -310,7 +310,7 @@ export default function MerchAndEvents() {
       : []),
   ];
 
-  // â”€â”€ Event columns â”€â”€
+  
   const eventColumns: ColumnDef<EventRecord, unknown>[] = [
     {
       accessorKey: "name",
@@ -416,12 +416,12 @@ export default function MerchAndEvents() {
           <TabsTrigger value="merch">Merchandise</TabsTrigger>
         </TabsList>
 
-        {/* â”€â”€ Events tab â”€â”€ */}
+        
         <TabsContent value="events" className="mt-6">
           <div className="flex items-center justify-between mb-4">
             <input
               className="rounded-full bg-background border border-border px-4 py-2 text-sm outline-none focus:border-[#5227FF] placeholder-muted-foreground"
-              placeholder="Search eventsâ€¦"
+              placeholder="Search events"
               value={eSearch}
               onChange={(e) => { setESearch(e.target.value); eFetch(1, e.target.value); }}
             />
@@ -461,7 +461,7 @@ export default function MerchAndEvents() {
               </TableHeader>
               <TableBody>
                 {eLoading ? (
-                  <TableRow><TableCell colSpan={eventColumns.length} className="h-24 text-center text-muted-foreground">Loadingâ€¦</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={eventColumns.length} className="h-24 text-center text-muted-foreground">Loading</TableCell></TableRow>
                 ) : eTable.getRowModel().rows.length ? (
                   eTable.getRowModel().rows.map((row) => (
                     <TableRow key={row.id}>
@@ -500,12 +500,11 @@ export default function MerchAndEvents() {
           )}
         </TabsContent>
 
-        {/* â”€â”€ Merch tab â”€â”€ */}
         <TabsContent value="merch" className="mt-6">
           <div className="flex items-center justify-between mb-4">
             <input
               className="rounded-full bg-background border border-border px-4 py-2 text-sm outline-none focus:border-[#5227FF] placeholder-muted-foreground"
-              placeholder="Search merchâ€¦"
+              placeholder="Search merch"
               value={mSearch}
               onChange={(e) => { setMSearch(e.target.value); mFetch(1, e.target.value); }}
             />
@@ -545,7 +544,7 @@ export default function MerchAndEvents() {
               </TableHeader>
               <TableBody>
                 {mLoading ? (
-                  <TableRow><TableCell colSpan={merchColumns.length} className="h-24 text-center text-muted-foreground">Loadingâ€¦</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={merchColumns.length} className="h-24 text-center text-muted-foreground">Loading</TableCell></TableRow>
                 ) : mTable.getRowModel().rows.length ? (
                   mTable.getRowModel().rows.map((row) => (
                     <TableRow key={row.id}>

@@ -56,7 +56,7 @@ export default function Home() {
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Create preview
+      
       const reader = new FileReader();
       reader.onloadend = () => {
         setAvatarPreview(reader.result as string);
@@ -83,7 +83,7 @@ export default function Home() {
         throw new Error(response.errorMessage.message || "Failed to upload photo");
       }
 
-      // Fetch user files to get the uploaded file's ID
+      
       const filesResponse = await api.apiUserFileGetPageGet({
         page: 1,
         pageSize: 100
@@ -93,7 +93,7 @@ export default function Home() {
         throw new Error(filesResponse.errorMessage.message || "Failed to fetch files");
       }
 
-      // Find the profile photo file
+      
       const profilePhotoFile = (filesResponse.response?.data ?? [])
         .filter((uploadedFile) => uploadedFile.description === "Profile Photo")
         .sort((left, right) => right.updatedAt.getTime() - left.updatedAt.getTime())[0];
@@ -102,7 +102,7 @@ export default function Home() {
         setStoredUserAvatarFileId(profilePhotoFile.id);
       }
 
-      // Clear file input and preview
+      
       setAvatarPreview(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -147,10 +147,10 @@ export default function Home() {
         parallaxOn
         hoverDuration={0.2}
       />
-      {/* Hero */}
+      
       <section className="px-8 py-4 shrink-0">
         <div className="flex flex-row items-center justify-between gap-6 bg-black px-4 py-3 rounded-3xl">
-          {/* Avatar + Name */}
+          
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <button 
@@ -177,7 +177,7 @@ export default function Home() {
                   </p>
                 )}
 
-                {/* Profile Photo Upload */}
+                
                 <div className="grid gap-2">
                   <label htmlFor="avatar" className="text-sm font-medium cursor-none">
                     Profile Photo
@@ -209,7 +209,7 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-                {/* Name Change */}
+                
                 <div className="grid gap-2">
                   <label htmlFor="name" className="text-sm font-medium cursor-none">
                     Full Name
@@ -224,7 +224,7 @@ export default function Home() {
                   />
                 </div>
 
-                {/* New Password */}
+                
                 <div className="grid gap-2">
                   <label htmlFor="password" className="text-sm font-medium cursor-none">
                     New Password
@@ -239,7 +239,7 @@ export default function Home() {
                   />
                 </div>
 
-                {/* Confirm Password */}
+                
                 {newPassword && (
                   <div className="grid gap-2">
                     <label htmlFor="confirm-password" className="text-sm font-medium cursor-none">
@@ -277,7 +277,7 @@ export default function Home() {
             </DialogContent>
           </Dialog>
 
-          {/* PixelBlast */}
+          
           <div className="flex flex-row h-14 flex-1 mx-6">
             <PixelBlast
               variant="square"
@@ -300,7 +300,7 @@ export default function Home() {
             />
           </div>
 
-          {/* Quick Stats */}
+          
           <div className="flex flex-col gap-1 shrink-0 text-white">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Quick Stats</p>
             <div className="flex flex-row gap-6">
@@ -326,7 +326,7 @@ export default function Home() {
       </section>
 
       <div className="border-t border-border" />
-      {/* Routes Grid */}
+      
       <section className="flex-1 w-full px-4 pb-4 min-h-0">
         <MagicBento
           textAutoHide={true}

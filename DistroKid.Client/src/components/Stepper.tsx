@@ -85,7 +85,7 @@ export default function Stepper({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      // Validate all required inputs in the current step
+      
       const container = formRef.current;
       if (container) {
         const inputs = container.querySelectorAll('input[required], select[required], textarea[required]');
@@ -151,7 +151,7 @@ export default function Stepper({
           </div>
         )}
 
-        {/* Step indicators at the bottom */}
+        
         <div className={`${stepContainerClassName} flex w-full items-center justify-center gap-2 p-6`}>
           {stepsArray.map((_, index) => {
             const stepNumber = index + 1;

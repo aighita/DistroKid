@@ -23,8 +23,6 @@ function readStoredAvatarFileId(userId: string | null | undefined): string | nul
     return storedFileId;
   }
 
-  // Global legacy values can point to a different account's avatar.
-  // Remove them and let the hook refetch the current user's own file.
   if (window.localStorage.getItem(LEGACY_AVATAR_URL_KEY)) {
     window.localStorage.removeItem(LEGACY_AVATAR_URL_KEY);
   }

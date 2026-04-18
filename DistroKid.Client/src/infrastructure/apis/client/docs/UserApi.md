@@ -31,13 +31,11 @@ import type { ApiUserAddPostRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new UserApi(config);
 
   const body = {
-    // UserAddRecord (optional)
     userAddRecord: ...,
   } satisfies ApiUserAddPostRequest;
 
@@ -48,8 +46,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 
@@ -100,13 +96,11 @@ import type { ApiUserDeleteIdDeleteRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new UserApi(config);
 
   const body = {
-    // string
     id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
   } satisfies ApiUserDeleteIdDeleteRequest;
 
@@ -117,8 +111,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 
@@ -169,13 +161,11 @@ import type { ApiUserGetByIdIdGetRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new UserApi(config);
 
   const body = {
-    // string
     id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
   } satisfies ApiUserGetByIdIdGetRequest;
 
@@ -186,8 +176,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 
@@ -238,17 +226,13 @@ import type { ApiUserGetPageGetRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new UserApi(config);
 
   const body = {
-    // string (optional)
     search: search_example,
-    // number (optional)
     page: 56,
-    // number (optional)
     pageSize: 56,
   } satisfies ApiUserGetPageGetRequest;
 
@@ -259,8 +243,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 
@@ -313,7 +295,6 @@ import type { ApiUserGetUserPlatformsGetRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new UserApi(config);
@@ -325,8 +306,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 
@@ -374,13 +353,11 @@ import type { ApiUserUpdatePutRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new UserApi(config);
 
   const body = {
-    // UserUpdateRecord (optional)
     userUpdateRecord: ...,
   } satisfies ApiUserUpdatePutRequest;
 
@@ -391,8 +368,6 @@ async function example() {
     console.error(error);
   }
 }
-
-// Run the test
 example().catch(console.error);
 ```
 
