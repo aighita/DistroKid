@@ -71,6 +71,7 @@ export default function FeatureLayout({
         contentRef={mainRef}
         userName={user?.name}
         avatarUrl={avatarUrl}
+        showHelpFeedbackButton={user?.role !== UserRoleEnum.Admin}
       />
       <main ref={mainRef}>
         {children}

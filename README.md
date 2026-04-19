@@ -102,6 +102,20 @@ cd .\DistroKid.Fixtures
 dotnet run
 ```
 
+## OpenAPI Client Generation
+
+Regenerate the frontend TypeScript client after backend endpoint or DTO changes:
+```powershell
+cd .\DistroKid.Client
+npm run generate:api
+```
+
+Or run the script directly:
+```powershell
+cd .\DistroKid.Client
+.\scripts\generate-api.ps1
+```
+
 ## License
 
 Educational material. See [LICENSE.md](LICENSE.md).

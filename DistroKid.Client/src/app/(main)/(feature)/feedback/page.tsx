@@ -23,10 +23,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { FeedbackApi } from "@/infrastructure/apis/client";
-import { getApiConfig } from "@/lib/api";
+import { UserRoleEnum } from "@/infrastructure/apis/client/models";
+import { useAuth } from "@/contexts/AuthContext";
+import { getApiConfig, runApiRequest } from "@/lib/api";
 
 export default function FeedbackPage() {
   const router = useRouter();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const [isLoading, setIsLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
   const [error, setError] = React.useState("");
@@ -38,21 +41,36 @@ export default function FeedbackPage() {
     comment: "",
   });
 
+  React.useEffect(() => {
+    if (!isAuthLoading && user?.role === UserRoleEnum.Admin) {
+      router.replace("/admin/feedback");
+    }
+  }, [isAuthLoading, router, user?.role]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (user?.role === UserRoleEnum.Admin) {
+      setError("Admins cannot submit feedback.");
+      return;
+    }
+
     setIsLoading(true);
     setError("");
 
     try {
       const api = new FeedbackApi(getApiConfig());
-      await api.apiFeedbackAddPost({
-        feedbackAddRecord: {
-          type: formData.type,
-          rating: parseInt(formData.rating, 10),
-          isAnonymous: formData.isAnonymous,
-          comment: formData.comment,
-        },
-      });
+      await runApiRequest(
+        () => api.apiFeedbackAddPost({
+          feedbackAddRecord: {
+            type: formData.type,
+            rating: parseInt(formData.rating, 10),
+            isAnonymous: formData.isAnonymous,
+            comment: formData.comment,
+          },
+        }),
+        "Failed to submit feedback",
+      );
       setSuccess(true);
       setTimeout(() => router.push("/releases"), 2000);
     } catch (err) {
@@ -61,6 +79,10 @@ export default function FeedbackPage() {
       setIsLoading(false);
     }
   };
+
+  if (isAuthLoading || user?.role === UserRoleEnum.Admin) {
+    return null;
+  }
 
   if (success) {
     return (

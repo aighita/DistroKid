@@ -11,6 +11,7 @@ import { LogOut, Upload as UploadIcon } from "lucide-react";
 import { updateUser } from "@/services/user";
 import { useAuthStore } from "@/stores/authStore";
 import { UserFileApi } from "@/infrastructure/apis/client";
+import { UserRoleEnum } from "@/infrastructure/apis/client/models";
 import { getApiConfig } from "@/lib/api";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { setStoredUserAvatarFileId, useUserAvatar } from "@/hooks/useUserAvatar";
@@ -340,6 +341,7 @@ export default function Home() {
           particleCount={12}
           glowColor="0, 0, 0"
           disableAnimations={false}
+          hideFeedbackCard={user?.role === UserRoleEnum.Admin}
         />
       </section>
     </div>

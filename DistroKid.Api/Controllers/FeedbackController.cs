@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using DistroKid.Database.Repository.Enums;
+using DistroKid.Infrastructure.Errors;
 using DistroKid.Infrastructure.Requests;
 using DistroKid.Infrastructure.Responses;
 using DistroKid.Services.Abstractions;
@@ -28,9 +31,24 @@ public class FeedbackController(ILogger<FeedbackController> logger, IUserService
     [HttpPost]
     public async Task<ActionResult<RequestResponse>> Add([FromBody] FeedbackAddRecord feedback)
     {
-        var currentUser = await GetCurrentUser();
-        // If user is not logged in, we still allow feedback (it will be anonymous if specified, or just null UserId)
-        Guid? userId = currentUser.Result?.Id;
+        Guid? userId = null;
+
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            var currentUser = await GetCurrentUser();
+
+            if (currentUser.Result == null)
+            {
+                return ErrorMessageResult(currentUser.Error);
+            }
+
+            if (currentUser.Result.Role == UserRoleEnum.Admin)
+            {
+                return ErrorMessageResult(new ErrorMessage(HttpStatusCode.Forbidden, "Admins cannot submit feedback."));
+            }
+
+            userId = currentUser.Result.Id;
+        }
 
         return FromServiceResponse(await _feedbackService.AddFeedback(feedback, userId));
     }

@@ -55,6 +55,7 @@ export default function AdminLayout({
                 contentRef={mainRef}
                 userName={user?.name}
                 avatarUrl={avatarUrl}
+                showHelpFeedbackButton={false}
             />
             <main ref={mainRef}>
                 <AdminRoute>

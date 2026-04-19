@@ -38,6 +38,7 @@ export interface BentoProps {
   glowColor?: string;
   clickEffect?: boolean;
   enableMagnetism?: boolean;
+  hideFeedbackCard?: boolean;
 }
 
 const DEFAULT_PARTICLE_COUNT = 12;
@@ -583,12 +584,16 @@ const MagicBento: React.FC<BentoProps> = ({
   enableTilt = false,
   glowColor = DEFAULT_GLOW_COLOR,
   clickEffect = true,
-  enableMagnetism = true
+  enableMagnetism = true,
+  hideFeedbackCard = false
 }) => {
   const gridRef = useRef<HTMLDivElement>(null);
   const isMobile = useMobileDetection();
   const shouldDisableAnimations = disableAnimations || isMobile;
   const router = useRouter();
+  const cards = hideFeedbackCard
+    ? cardData.filter((card) => card.href !== '/feedback')
+    : cardData;
 
   return (
     <div className="w-full h-full">
@@ -734,7 +739,7 @@ const MagicBento: React.FC<BentoProps> = ({
 
       <BentoCardGrid gridRef={gridRef}>
         <div className="card-responsive grid gap-2 h-full">
-          {cardData.map((card, index) => {
+          {cards.map((card, index) => {
             const baseClassName = `card flex flex-col justify-between relative min-h-0 w-full max-w-full p-5 rounded-[20px] border border-solid font-light overflow-hidden transition-colors duration-300 ease-in-out hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(0,0,0,0.15)] ${
               enableBorderGlow ? 'card--border-glow cursor-target' : ''
             }`;

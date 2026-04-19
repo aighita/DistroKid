@@ -47,6 +47,7 @@ export interface StaggeredMenuProps {
   onMenuClose?: () => void;
   userName?: string;
   avatarUrl?: string;
+  showHelpFeedbackButton?: boolean;
 }
 
 export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
@@ -71,7 +72,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   onMenuOpen,
   onMenuClose,
   userName = 'User',
-  avatarUrl
+  avatarUrl,
+  showHelpFeedbackButton = true,
 }: StaggeredMenuProps) => {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -670,6 +672,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
               </div>
             )}
 
+            {showHelpFeedbackButton && (
             <div className="sm-help-button mt-4">
               <button
                 onClick={(e) => { e.preventDefault(); navigateWithClose('/feedback'); }}
@@ -684,6 +687,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                 </div>
               </button>
             </div>
+            )}
 
             {displaySocials && socialItems && socialItems.length > 0 && (
               <div className="sm-socials mt-auto pt-8 flex flex-col gap-3" aria-label="Social links">
