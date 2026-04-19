@@ -4,7 +4,7 @@ import { createContext, useEffect, useState, ReactNode, useContext } from 'react
 import type { UserRecord } from '@/lib/openapi/models';
 import { UserApi } from '@/infrastructure/apis/client';
 import { ResponseError } from '@/infrastructure/apis/client/runtime';
-import { getApiConfig } from '@/lib/api';
+import { clearClientSession, getApiConfig } from '@/lib/api';
 import { useAuthStore } from '@/stores/authStore';
 
 export interface AuthContextType {
@@ -36,12 +36,13 @@ export function useAuth() {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
-  const [isValidatingSession, setIsValidatingSession] = useState(false);
+  const [isValidatingSession, setIsValidatingSession] = useState(true);
 
   
   const user = useAuthStore((state) => state.user);
   const token = useAuthStore((state) => state.token);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isHydrated = useAuthStore((state) => state.isHydrated);
   const login = useAuthStore((state) => state.login);
   const logout = useAuthStore((state) => state.logout);
 
@@ -51,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!mounted) {
+    if (!mounted || !isHydrated) {
       return;
     }
 
@@ -73,12 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         if (error instanceof ResponseError && (error.response.status === 401 || error.response.status === 404)) {
-          logout();
-
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem('userAvatarFileId');
-            localStorage.removeItem('userAvatarUrl');
-          }
+          clearClientSession();
         }
       } finally {
         if (!ignore) {
@@ -92,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       ignore = true;
     };
-  }, [mounted, logout, token, user?.id]);
+  }, [isHydrated, mounted, token, user?.id]);
 
   
   
@@ -102,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user: mounted ? user : null,
         token: mounted ? token : null,
         isAuthenticated: mounted ? isAuthenticated : false,
-        isLoading: !mounted || isValidatingSession,
+        isLoading: !mounted || !isHydrated || isValidatingSession,
         login,
         logout,
       }}

@@ -27,12 +27,30 @@ const EMPTY_STATS: DashboardStats = {
 };
 
 export function useDashboardStats() {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isHydrated = useAuthStore((state) => state.isHydrated);
+  const token = useAuthStore((state) => state.token);
   const user = useAuthStore((state) => state.user);
   const [stats, setStats] = useState<DashboardStats>(EMPTY_STATS);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
+
+    if (!isHydrated) {
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    if (!isAuthenticated || !token) {
+      setStats(EMPTY_STATS);
+      setIsLoading(false);
+
+      return () => {
+        cancelled = true;
+      };
+    }
 
     async function loadStats() {
       setIsLoading(true);
@@ -73,7 +91,7 @@ export function useDashboardStats() {
     return () => {
       cancelled = true;
     };
-  }, [user?.id, user?.role]);
+  }, [isAuthenticated, isHydrated, token, user?.id, user?.role]);
 
   return {
     ...stats,

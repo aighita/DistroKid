@@ -1,6 +1,6 @@
 import { UserApi, type ApiUserGetPageGetRequest } from "@/infrastructure/apis/client/apis";
 import type { PlatformRecord, UserUpdateRecord } from "@/infrastructure/apis/client/models";
-import { getApiConfig } from "@/lib/api";
+import { getApiConfig, getResponseErrorMessage, runApiRequest } from "@/lib/api";
 import { useAuthStore } from "@/stores/authStore";
 
 function getBaseUrl() {
@@ -18,9 +18,13 @@ async function authorizedFetch<T>(path: string, init?: RequestInit): Promise<T> 
         },
     });
 
+    if (!response.ok) {
+        throw new Error(await getResponseErrorMessage(response, "Request failed"));
+    }
+
     const payload = await response.json();
 
-    if (!response.ok || payload.errorMessage) {
+    if (payload.errorMessage) {
         throw new Error(payload.errorMessage?.message || "Request failed");
     }
 
@@ -29,11 +33,14 @@ async function authorizedFetch<T>(path: string, init?: RequestInit): Promise<T> 
 
 export async function getUsersPage(page: number, pageSize: number, search?: string) {
     const api = new UserApi(getApiConfig());
-    const response = await api.apiUserGetPageGet({
-        page,
-        pageSize,
-        search
-    });
+    const response = await runApiRequest(
+        () => api.apiUserGetPageGet({
+            page,
+            pageSize,
+            search
+        }),
+        "Failed to fetch users",
+    );
 
     if (response.errorMessage || !response.response) {
         throw new Error(response.errorMessage?.message || "Failed to fetch users");
@@ -44,7 +51,7 @@ export async function getUsersPage(page: number, pageSize: number, search?: stri
 
 export async function updateUser(user: UserUpdateRecord) {
     const api = new UserApi(getApiConfig());
-    const response = await api.apiUserUpdatePut({ userUpdateRecord: user });
+    const response = await runApiRequest(() => api.apiUserUpdatePut({ userUpdateRecord: user }), "Failed to update user");
 
     if (response.errorMessage) {
         throw new Error(response.errorMessage.message || "Failed to update user");
@@ -55,7 +62,7 @@ export async function updateUser(user: UserUpdateRecord) {
 
 export async function deleteUser(id: string) {
     const api = new UserApi(getApiConfig());
-    const response = await api.apiUserDeleteIdDelete({ id });
+    const response = await runApiRequest(() => api.apiUserDeleteIdDelete({ id }), "Failed to delete user");
 
     if (response.errorMessage) {
         throw new Error(response.errorMessage.message || "Failed to delete user");
@@ -66,7 +73,7 @@ export async function deleteUser(id: string) {
 
 export async function getCurrentUserPlatforms() {
     const api = new UserApi(getApiConfig());
-    const response = await api.apiUserGetUserPlatformsGet();
+    const response = await runApiRequest(() => api.apiUserGetUserPlatformsGet(), "Failed to fetch connected platforms");
 
     if (response.errorMessage) {
         throw new Error(response.errorMessage.message || "Failed to fetch connected platforms");

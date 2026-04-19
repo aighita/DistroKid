@@ -43,9 +43,6 @@ cd .\DistroKid.Deployment
 http://localhost:5000/swagger
 ```
 
-The `start-stack.ps1` script runs `docker compose up --build -d` from `DistroKid.Deployment`, builds the client and API images, starts PostgreSQL and the .NET application, then tries to open Swagger automatically.
-The `apply-fixtures.ps1` script runs the fixtures project, which seeds the development data set.
-
 ## Access
 
 - Frontend: http://localhost:5000/
@@ -61,10 +58,15 @@ This project demonstrates Next.js Static Site Generation (SSG) with static file 
 - Eliminates the need for a separate frontend server in production
 - Shows how to integrate modern frontend frameworks with .NET backends
 
+> ! NEXT_PUBLIC_API_URL should be empty when using NextjsStaticHosting package.
+
 ## Default Credentials
 
-- Email: admin@default.com
-- Password: default
+- Email: admin@distrokid.com
+- Password: admin
+
+- Email: artist@example.com
+- Password: artist
 
 ## Database Migrations
 
@@ -99,12 +101,6 @@ Or run the fixtures project directly:
 cd .\DistroKid.Fixtures
 dotnet run
 ```
-
-## Delivery Notes
-
-- The repository should be delivered as a zip of the `main` branch.
-- The repo includes this `README.md` with the setup and run steps required to start the solution.
-- Running the deployment script starts the application stack and exposes Swagger with all project endpoints at `http://localhost:5000/swagger`.
 
 ## License
 

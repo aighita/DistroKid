@@ -1,5 +1,5 @@
 import { FeedbackApi, type ApiFeedbackGetPageGetRequest } from "@/infrastructure/apis/client/apis";
-import { getApiConfig } from "@/lib/api";
+import { getApiConfig, runApiRequest } from "@/lib/api";
 
 
 
@@ -7,11 +7,14 @@ import { getApiConfig } from "@/lib/api";
 
 export async function getFeedbackPage(page: number, pageSize: number, search?: string) {
     const api = new FeedbackApi(getApiConfig());
-    const response = await api.apiFeedbackGetPageGet({
-        page,
-        pageSize,
-        search
-    });
+    const response = await runApiRequest(
+        () => api.apiFeedbackGetPageGet({
+            page,
+            pageSize,
+            search
+        }),
+        "Failed to fetch feedback",
+    );
 
     if (response.errorMessage || !response.response) {
         throw new Error(response.errorMessage?.message || "Failed to fetch feedback");

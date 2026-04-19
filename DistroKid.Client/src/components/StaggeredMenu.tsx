@@ -597,7 +597,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                   <div className="flex flex-row items-center gap-3">
                     <Avatar className="sm-panel-avatar grayscale hover:grayscale-0 transition-[filter] duration-300" size="lg">
                       <AvatarImage
-                        src={avatarUrl || "https://github.com/shadcn.png"}
+                        src={avatarUrl || userName?.[0] || 'U'}
                         alt={userName}
                         className=""
                       />

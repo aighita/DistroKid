@@ -1,6 +1,6 @@
 import { AuthorizationApi } from "@/infrastructure/apis/client";
 import type { LoginRecord, RegisterRecord } from "@/infrastructure/apis/client/models";
-import { getApiConfig } from "@/lib/api";
+import { getApiConfig, runApiRequest } from "@/lib/api";
 
 function getApi() {
   return new AuthorizationApi(getApiConfig());
@@ -9,7 +9,10 @@ function getApi() {
 
 export async function login(email: string, password: string) {
   const loginData: LoginRecord = { email, password };
-  const response = await getApi().apiAuthorizationLoginPost({ loginRecord: loginData });
+  const response = await runApiRequest(
+    () => getApi().apiAuthorizationLoginPost({ loginRecord: loginData }),
+    "Login failed",
+  );
 
   if (response.errorMessage) {
     throw new Error(response.errorMessage.message ?? "Login failed");
@@ -38,7 +41,10 @@ export async function register(
     socialMediaLink,
   };
 
-  const response = await getApi().apiAuthorizationRegisterPost({ registerRecord: registerData });
+  const response = await runApiRequest(
+    () => getApi().apiAuthorizationRegisterPost({ registerRecord: registerData }),
+    "Registration failed",
+  );
 
   if (response.errorMessage) {
     throw new Error(response.errorMessage.message ?? "Registration failed");
