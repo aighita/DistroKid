@@ -1,4 +1,5 @@
 using System.Net;
+using Microsoft.EntityFrameworkCore;
 using DistroKid.Database.Repository;
 using DistroKid.Database.Repository.Entities;
 using DistroKid.Database.Repository.Enums;
@@ -16,6 +17,13 @@ namespace DistroKid.Services.Implementations;
 
 public class ReleaseService(IRepository<WebAppDatabaseContext> repository, IMailService mailService) : IReleaseService
 {
+    private static DateTime ToUtc(DateTime value) => value.Kind switch
+    {
+        DateTimeKind.Utc => value,
+        DateTimeKind.Unspecified => DateTime.SpecifyKind(value, DateTimeKind.Utc),
+        _ => value.ToUniversalTime(),
+    };
+
     public async Task<ServiceResponse<ReleaseRecord>> GetReleaseById(Guid id, UserRecord requestingUser, CancellationToken cancellationToken = default)
     {
         var accessibleArtistIds = await AccessScopeHelper.GetAccessibleArtistIds(repository, requestingUser, cancellationToken);
@@ -144,25 +152,44 @@ public class ReleaseService(IRepository<WebAppDatabaseContext> repository, IMail
             platforms.Add(platform);
         }
 
-        await repository.AddAsync(new Release
-        {
-            Title = release.Title,
-            ReleaseDate = release.ReleaseDate,
-            Label = release.Label,
-            ReleaseType = release.ReleaseType,
-            ArtistId = artistId,
-            Tracks = tracks,
-            Platforms = platforms
-        }, cancellationToken);
+        await using var transaction = await repository.DbContext.Database.BeginTransactionAsync(cancellationToken);
 
-        // Notify the artist by email
-        await mailService.SendMail(
-            artistEmail,
-            "New Release Published!",
-            MailTemplates.ReleaseAddTemplate(artistName, release.Title),
-            true,
-            "DistroKid",
-            cancellationToken);
+        try
+        {
+            await repository.DbContext.Set<Release>().AddAsync(new Release
+            {
+                Title = release.Title,
+                ReleaseDate = ToUtc(release.ReleaseDate),
+                Label = release.Label,
+                ReleaseType = release.ReleaseType,
+                ArtistId = artistId,
+                Tracks = tracks,
+                Platforms = platforms
+            }, cancellationToken);
+
+            await repository.DbContext.SaveChangesAsync(cancellationToken);
+
+            var mailResult = await mailService.SendMail(
+                artistEmail,
+                "New Release Published!",
+                MailTemplates.ReleaseAddTemplate(artistName, release.Title),
+                true,
+                "DistroKid",
+                cancellationToken);
+
+            if (!mailResult.IsOk)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                return mailResult;
+            }
+
+            await transaction.CommitAsync(cancellationToken);
+        }
+        catch (DbUpdateException)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
+        }
 
         return ServiceResponse.ForSuccess();
     }
@@ -193,7 +220,7 @@ public class ReleaseService(IRepository<WebAppDatabaseContext> repository, IMail
         entity.Title = release.Title ?? entity.Title;
         entity.Label = release.Label ?? entity.Label;
         if (release.ReleaseType.HasValue) entity.ReleaseType = release.ReleaseType.Value;
-        if (release.ReleaseDate.HasValue) entity.ReleaseDate = release.ReleaseDate.Value;
+        if (release.ReleaseDate.HasValue) entity.ReleaseDate = ToUtc(release.ReleaseDate.Value);
 
         var releaseArtist = entity.ArtistId.HasValue
             ? await repository.GetAsync(new UserWithPlatformsSpec(entity.ArtistId.Value), cancellationToken)

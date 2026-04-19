@@ -341,6 +341,7 @@ export default function Home() {
           particleCount={12}
           glowColor="0, 0, 0"
           disableAnimations={false}
+          hideUploadCard={user?.role === UserRoleEnum.Admin}
           hideFeedbackCard={user?.role === UserRoleEnum.Admin}
         />
       </section>

@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Microsoft.EntityFrameworkCore;
 using DistroKid.Database.Repository;
 using DistroKid.Database.Repository.Entities;
 using DistroKid.Database.Repository.Enums;
@@ -87,9 +88,34 @@ public class UserService(IRepository<WebAppDatabaseContext> repository, ILoginSe
             }
         };
 
-        await repository.AddAsync(newUser, cancellationToken); // A new entity is created and persisted in the database.
+        await using var transaction = await repository.DbContext.Database.BeginTransactionAsync(cancellationToken);
 
-        // await mailService.SendMail(register.Email, "Welcome!", MailTemplates.UserAddTemplate(register.Name), true, "My App", cancellationToken); // You can send a notification on the user email. Change the email if you want.
+        try
+        {
+            await repository.DbContext.Set<User>().AddAsync(newUser, cancellationToken);
+            await repository.DbContext.SaveChangesAsync(cancellationToken);
+
+            var mailResult = await mailService.SendMail(
+                register.Email,
+                "Welcome!",
+                MailTemplates.UserAddTemplate(register.Name),
+                true,
+                "DistroKid",
+                cancellationToken);
+
+            if (!mailResult.IsOk)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                return ServiceResponse.FromError<LoginResponseRecord>(mailResult.Error);
+            }
+
+            await transaction.CommitAsync(cancellationToken);
+        }
+        catch (DbUpdateException)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
+        }
 
         var user = new UserRecord
         {

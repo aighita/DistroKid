@@ -8,6 +8,12 @@ services:
     environment:
       ASPNETCORE_URLS: "http://+:5001"
       ConnectionStrings__WebAppDatabase: "Server=distro-kid-db;Port=5432;Database=distro-kid;User Id=distro-kid;Password=distro-kid;"
+      MailConfiguration__MailEnable: "${MAIL_ENABLE:-false}"
+      MailConfiguration__MailHost: "${MAIL_HOST:-sandbox.smtp.mailtrap.io}"
+      MailConfiguration__MailPort: "${MAIL_PORT:-2525}"
+      MailConfiguration__MailAddress: "${MAIL_ADDRESS:-test@my.app}"
+      MailConfiguration__MailUser: "${MAIL_USER:-}"
+      MailConfiguration__MailPassword: "${MAIL_PASSWORD:-}"
     depends_on:
       - distro-kid-db
 

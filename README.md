@@ -1,5 +1,7 @@
 ﻿# DistroKid
 
+Repository: https://github.com/aighita/DistroKid
+
 Full-stack web application built with .NET 10 backend and Next.js frontend. Demonstrates REST API development, database management, JWT authentication, and client-side development.
 
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/) [![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-10-512BD4?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/) [![Next.js](https://img.shields.io/badge/Next.js-React-000?style=flat-square&logo=nextdotjs)](https://nextjs.org/) [![React](https://img.shields.io/badge/React-18+-61DAFB?style=flat-square&logo=react)](https://react.dev/) [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Latest-336791?style=flat-square&logo=postgresql)](https://www.postgresql.org/) [![JWT](https://img.shields.io/badge/JWT-Authentication-000?style=flat-square&logo=jsonwebtokens)](https://jwt.io/)
@@ -41,6 +43,22 @@ cd .\DistroKid.Deployment
 4. Open Swagger if it was not opened automatically:
 ```powershell
 http://localhost:5000/swagger
+```
+
+5. Optional: enable Mailtrap notifications for release creation and new account registration.
+Create `DistroKid.Deployment/.env` from `DistroKid.Deployment/.env.example` and fill:
+```env
+MAIL_ENABLE=true
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_ADDRESS=<your-mailtrap-sender-address>
+MAIL_USER=<your-mailtrap-username>
+MAIL_PASSWORD=<your-mailtrap-password>
+```
+Then rebuild the stack:
+```powershell
+cd .\DistroKid.Deployment
+.\start-stack.ps1 -NoBrowser
 ```
 
 ## Access
@@ -115,6 +133,25 @@ Or run the script directly:
 cd .\DistroKid.Client
 .\scripts\generate-api.ps1
 ```
+
+## Mailtrap Notifications
+
+The project supports Mailtrap-backed notifications for the `Add Release` and `Register` actions.
+When a release is created successfully, the backend sends an email to the target artist. When a new account is created through registration, the backend sends a welcome email to the newly registered user.
+
+Required variables in `DistroKid.Deployment/.env`:
+```env
+MAIL_ENABLE=true
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_ADDRESS=<your-mailtrap-sender-address>
+MAIL_USER=<your-mailtrap-username>
+MAIL_PASSWORD=<your-mailtrap-password>
+```
+
+Behavior:
+- If Mailtrap is disabled, release creation still works and email sending is skipped.
+- If Mailtrap is enabled and the email send fails, both release creation and registration now fail and are rolled back.
 
 ## License
 

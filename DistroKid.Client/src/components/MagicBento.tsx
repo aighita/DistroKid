@@ -38,6 +38,7 @@ export interface BentoProps {
   glowColor?: string;
   clickEffect?: boolean;
   enableMagnetism?: boolean;
+  hideUploadCard?: boolean;
   hideFeedbackCard?: boolean;
 }
 
@@ -585,15 +586,24 @@ const MagicBento: React.FC<BentoProps> = ({
   glowColor = DEFAULT_GLOW_COLOR,
   clickEffect = true,
   enableMagnetism = true,
+  hideUploadCard = false,
   hideFeedbackCard = false
 }) => {
   const gridRef = useRef<HTMLDivElement>(null);
   const isMobile = useMobileDetection();
   const shouldDisableAnimations = disableAnimations || isMobile;
   const router = useRouter();
-  const cards = hideFeedbackCard
-    ? cardData.filter((card) => card.href !== '/feedback')
-    : cardData;
+  const cards = cardData.filter((card) => {
+    if (hideUploadCard && card.href === '/upload') {
+      return false;
+    }
+
+    if (hideFeedbackCard && card.href === '/feedback') {
+      return false;
+    }
+
+    return true;
+  });
 
   return (
     <div className="w-full h-full">
