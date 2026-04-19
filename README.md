@@ -18,38 +18,33 @@ Full-stack web application built with .NET 10 backend and Next.js frontend. Demo
 - .NET 10 SDK
 - Docker and Docker Compose
 - Node.js 18+ and npm
+- Entity Framework CLI: `dotnet tool install --global dotnet-ef --version 10.*`
 
 ### Quick Start
 
-1. Install Entity Framework tools:
-```powershell
-dotnet tool install --global dotnet-ef --version 10.*
-```
-
-2. Start PostgreSQL database:
+1. Build and start the full stack from the deployment folder:
 ```powershell
 cd .\DistroKid.Deployment
-docker-compose -f .\docker-compose.yml -p distrokid-db up -d
+.\start-stack.ps1
 ```
 
-3. Create and apply migrations:
+2. Apply the pending database migrations:
 ```powershell
-cd .\DistroKid.Database
-.\migrate.ps1 -name InitialMigration -update
+.\apply-migrations.ps1
 ```
 
-4. Start the backend:
+3. Apply the development fixtures:
 ```powershell
-cd ..\DistroKid.Api
-dotnet run
+.\apply-fixtures.ps1
 ```
 
-5. Start the frontend (optional):
+4. Open Swagger if it was not opened automatically:
 ```powershell
-cd ..\DistroKid.Client
-npm install
-npm run dev
+http://localhost:5000/swagger
 ```
+
+The `start-stack.ps1` script runs `docker compose up --build -d` from `DistroKid.Deployment`, builds the client and API images, starts PostgreSQL and the .NET application, then tries to open Swagger automatically.
+The `apply-fixtures.ps1` script runs the fixtures project, which seeds the development data set.
 
 ## Access
 
@@ -78,6 +73,38 @@ Create a new migration:
 cd .\DistroKid.Database
 .\migrate.ps1 -name <MigrationName> -update
 ```
+
+Apply existing pending migrations only:
+```powershell
+cd .\DistroKid.Database
+.\migrate.ps1 -update
+```
+
+Or from the deployment folder:
+```powershell
+cd .\DistroKid.Deployment
+.\apply-migrations.ps1
+```
+
+## Fixtures
+
+Apply the development fixtures from the deployment folder:
+```powershell
+cd .\DistroKid.Deployment
+.\apply-fixtures.ps1
+```
+
+Or run the fixtures project directly:
+```powershell
+cd .\DistroKid.Fixtures
+dotnet run
+```
+
+## Delivery Notes
+
+- The repository should be delivered as a zip of the `main` branch.
+- The repo includes this `README.md` with the setup and run steps required to start the solution.
+- Running the deployment script starts the application stack and exposes Swagger with all project endpoints at `http://localhost:5000/swagger`.
 
 ## License
 

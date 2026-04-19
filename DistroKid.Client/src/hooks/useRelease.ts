@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { ReleaseRecord } from "@/infrastructure/apis/client/models";
 import { ReleaseTypeEnum } from "@/infrastructure/apis/client/models";
 import { getReleasesPage, addRelease, updateRelease, deleteRelease } from "@/services/release";
@@ -15,30 +15,37 @@ export function useRelease() {
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const pageRef = useRef(1);
+  const searchRef = useRef("");
 
   const PAGE_SIZE = 10;
 
   const fetchPage = useCallback(
-    async (p: number = page, s: string = search) => {
+    async (p: number = pageRef.current, s: string = searchRef.current) => {
+      const nextPage = Math.max(1, p);
+      const nextSearch = s ?? "";
+
       setIsLoading(true);
       setError(null);
       try {
-        const result = await getReleasesPage(p, PAGE_SIZE, s || undefined);
+        const result = await getReleasesPage(nextPage, PAGE_SIZE, nextSearch || undefined);
         setItems(result.data ?? []);
         setTotalCount(result.totalCount ?? 0);
-        setPage(p);
+        setPage(nextPage);
+        setSearch(nextSearch);
+        pageRef.current = nextPage;
+        searchRef.current = nextSearch;
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load releases");
       } finally {
         setIsLoading(false);
       }
     },
-    [page, search],
+    [],
   );
 
   const handleSearch = (value: string) => {
-    setSearch(value);
-    fetchPage(1, value);
+    return fetchPage(1, value);
   };
 
   const handleAdd = async (data: {
@@ -59,7 +66,7 @@ export function useRelease() {
       platformIds: data.platformIds,
       artistId: data.artistId,
     });
-    await fetchPage(page, search);
+    await fetchPage();
   };
 
   const handleUpdate = async (
@@ -74,12 +81,12 @@ export function useRelease() {
     },
   ) => {
     await updateRelease(id, data);
-    await fetchPage(page, search);
+    await fetchPage();
   };
 
   const handleDelete = async (id: string) => {
     await deleteRelease(id);
-    await fetchPage(page, search);
+    await fetchPage();
   };
 
   const pageCount = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));

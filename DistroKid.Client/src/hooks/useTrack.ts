@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { TrackRecord } from "@/infrastructure/apis/client/models";
 import { getTracksPage, addTrack, updateTrack, deleteTrack } from "@/services/track";
 import { useAuthStore } from "@/stores/authStore";
@@ -14,30 +14,37 @@ export function useTrack() {
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const pageRef = useRef(1);
+  const searchRef = useRef("");
 
   const PAGE_SIZE = 10;
 
   const fetchPage = useCallback(
-    async (p: number = page, s: string = search) => {
+    async (p: number = pageRef.current, s: string = searchRef.current) => {
+      const nextPage = Math.max(1, p);
+      const nextSearch = s ?? "";
+
       setIsLoading(true);
       setError(null);
       try {
-        const result = await getTracksPage(p, PAGE_SIZE, s || undefined);
+        const result = await getTracksPage(nextPage, PAGE_SIZE, nextSearch || undefined);
         setItems(result.data ?? []);
         setTotalCount(result.totalCount ?? 0);
-        setPage(p);
+        setPage(nextPage);
+        setSearch(nextSearch);
+        pageRef.current = nextPage;
+        searchRef.current = nextSearch;
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load tracks");
       } finally {
         setIsLoading(false);
       }
     },
-    [page, search],
+    [],
   );
 
   const handleSearch = (value: string) => {
-    setSearch(value);
-    fetchPage(1, value);
+    return fetchPage(1, value);
   };
 
   const handleAdd = async (data: { title: string; durationInSeconds: number; isrc: string }) => {
@@ -47,7 +54,7 @@ export function useTrack() {
       isrc: data.isrc,
       artistId: user?.id ?? "",
     });
-    await fetchPage(page, search);
+    await fetchPage();
   };
 
   const handleUpdate = async (
@@ -61,12 +68,12 @@ export function useTrack() {
       isrc: data.isrc,
       artistId: user?.id ?? "",
     });
-    await fetchPage(page, search);
+    await fetchPage();
   };
 
   const handleDelete = async (id: string) => {
     await deleteTrack(id);
-    await fetchPage(page, search);
+    await fetchPage();
   };
 
   const pageCount = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));

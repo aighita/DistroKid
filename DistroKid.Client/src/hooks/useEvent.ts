@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { EventRecord } from "@/infrastructure/apis/client/models";
 import { getEventsPage, addEvent, updateEvent, deleteEvent } from "@/services/event";
 
@@ -11,30 +11,37 @@ export function useEvent() {
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const pageRef = useRef(1);
+  const searchRef = useRef("");
 
   const PAGE_SIZE = 10;
 
   const fetchPage = useCallback(
-    async (p: number = page, s: string = search) => {
+    async (p: number = pageRef.current, s: string = searchRef.current) => {
+      const nextPage = Math.max(1, p);
+      const nextSearch = s ?? "";
+
       setIsLoading(true);
       setError(null);
       try {
-        const result = await getEventsPage(p, PAGE_SIZE, s || undefined);
+        const result = await getEventsPage(nextPage, PAGE_SIZE, nextSearch || undefined);
         setItems(result.data ?? []);
         setTotalCount(result.totalCount ?? 0);
-        setPage(p);
+        setPage(nextPage);
+        setSearch(nextSearch);
+        pageRef.current = nextPage;
+        searchRef.current = nextSearch;
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load events");
       } finally {
         setIsLoading(false);
       }
     },
-    [page, search],
+    [],
   );
 
   const handleSearch = (value: string) => {
-    setSearch(value);
-    fetchPage(1, value);
+    return fetchPage(1, value);
   };
 
   const handleAdd = async (data: {
@@ -44,7 +51,7 @@ export function useEvent() {
     date: Date;
   }) => {
     await addEvent(data);
-    await fetchPage(page, search);
+    await fetchPage();
   };
 
   const handleUpdate = async (
@@ -52,12 +59,12 @@ export function useEvent() {
     data: { name?: string; description?: string; location?: string; date?: Date },
   ) => {
     await updateEvent(id, data);
-    await fetchPage(page, search);
+    await fetchPage();
   };
 
   const handleDelete = async (id: string) => {
     await deleteEvent(id);
-    await fetchPage(page, search);
+    await fetchPage();
   };
 
   const pageCount = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
