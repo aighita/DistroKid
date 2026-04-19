@@ -112,8 +112,8 @@ export default function Tracks() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const user = useAuthStore((s) => s.user);
-  const canEdit = user?.role === "Artist" || user?.role === "Admin";
   const isAdmin = user?.role === "Admin";
+  const canManageTracks = user?.role === "Artist";
 
   const { items, page, pageCount, isLoading, error, fetchPage, handleAdd, handleUpdate, handleDelete } =
     useTrack();
@@ -129,7 +129,7 @@ export default function Tracks() {
   }, [fetchPage]);
 
   React.useEffect(() => {
-    if (!canEdit || searchParams.get("openAdd") !== "1") {
+    if (!canManageTracks || searchParams.get("openAdd") !== "1") {
       return;
     }
 
@@ -139,7 +139,7 @@ export default function Tracks() {
     params.delete("openAdd");
     const query = params.toString();
     router.replace(query ? `/tracks?${query}` : "/tracks");
-  }, [canEdit, router, searchParams]);
+  }, [canManageTracks, router, searchParams]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value);
@@ -188,7 +188,7 @@ export default function Tracks() {
         <span className="font-mono text-xs text-muted-foreground">{row.getValue("isrc")}</span>
       ),
     },
-    ...(canEdit
+    ...(canManageTracks
       ? [
           {
             id: "actions",
@@ -239,7 +239,7 @@ export default function Tracks() {
             value={searchInput}
             onChange={handleSearch}
           />
-          {canEdit && (
+          {canManageTracks && (
             <Dialog open={addOpen} onOpenChange={setAddOpen}>
               <DialogTrigger asChild>
                 <Button className="gap-2 rounded-full">

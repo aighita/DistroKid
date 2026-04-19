@@ -1,49 +1,153 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import * as React from "react";
 import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import type { PlatformRecord } from "@/infrastructure/apis/client/models";
 import { useAuthStore } from "@/stores/authStore";
-import { getAllPlatforms } from "@/services/platform";
+import { addPlatform, deletePlatform, getAllPlatforms } from "@/services/platform";
 import {
   connectCurrentUserPlatform,
   disconnectCurrentUserPlatform,
   getCurrentUserPlatforms,
 } from "@/services/user";
+import { Plus, Trash2 } from "lucide-react";
+
+function PlatformForm({
+  onSubmit,
+  onClose,
+  isLoading,
+}: {
+  onSubmit: (data: { name: string; url: string }) => Promise<void>;
+  onClose: () => void;
+  isLoading: boolean;
+}) {
+  const [name, setName] = React.useState("");
+  const [url, setUrl] = React.useState("");
+  const [err, setErr] = React.useState("");
+
+  const inputCls =
+    "w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#5227FF] text-sm";
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErr("");
+
+    if (!name.trim()) {
+      setErr("Name is required");
+      return;
+    }
+
+    if (!url.trim()) {
+      setErr("URL is required");
+      return;
+    }
+
+    try {
+      new URL(url.trim());
+    } catch {
+      setErr("URL must be valid");
+      return;
+    }
+
+    try {
+      await onSubmit({ name: name.trim(), url: url.trim() });
+      onClose();
+    } catch (submitError) {
+      setErr(submitError instanceof Error ? submitError.message : "Failed to add platform");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 pt-2">
+      {err && (
+        <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+          {err}
+        </p>
+      )}
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-medium">Name</label>
+        <input
+          className={inputCls}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Platform name"
+        />
+      </div>
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-medium">URL</label>
+        <input
+          className={inputCls}
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="https://platform.example.com"
+        />
+      </div>
+      <div className="flex gap-3 pt-2">
+        <Button type="submit" className="flex-1" disabled={isLoading}>
+          {isLoading ? "Saving..." : "Save"}
+        </Button>
+        <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
+          Cancel
+        </Button>
+      </div>
+    </form>
+  );
+}
 
 export default function Platforms() {
   const user = useAuthStore((state) => state.user);
   const isArtist = user?.role === "Artist";
-  const [platforms, setPlatforms] = useState<PlatformRecord[]>([]);
-  const [connectedPlatformIds, setConnectedPlatformIds] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [actionPlatformId, setActionPlatformId] = useState<string | null>(null);
-  const [error, setError] = useState("");
+  const isAdmin = user?.role === "Admin";
+  const [platforms, setPlatforms] = React.useState<PlatformRecord[]>([]);
+  const [connectedPlatformIds, setConnectedPlatformIds] = React.useState<string[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [actionPlatformId, setActionPlatformId] = React.useState<string | null>(null);
+  const [error, setError] = React.useState("");
+  const [addOpen, setAddOpen] = React.useState(false);
+  const [actionLoading, setActionLoading] = React.useState(false);
+  const [deleteItem, setDeleteItem] = React.useState<PlatformRecord | null>(null);
 
-  useEffect(() => {
-    const loadPlatforms = async () => {
-      setIsLoading(true);
-      setError("");
+  const loadPlatforms = React.useCallback(async () => {
+    setIsLoading(true);
+    setError("");
 
-      try {
-        const [allPlatforms, connectedPlatforms] = await Promise.all([
-          getAllPlatforms(),
-          isArtist ? getCurrentUserPlatforms() : Promise.resolve([]),
-        ]);
+    try {
+      const [allPlatforms, connectedPlatforms] = await Promise.all([
+        getAllPlatforms(),
+        isArtist ? getCurrentUserPlatforms() : Promise.resolve([]),
+      ]);
 
-        setPlatforms(allPlatforms);
-        setConnectedPlatformIds(connectedPlatforms.map((platform) => platform.id ?? ""));
-      } catch (loadError) {
-        setError(loadError instanceof Error ? loadError.message : "Failed to load platforms");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadPlatforms();
+      setPlatforms(allPlatforms);
+      setConnectedPlatformIds(connectedPlatforms.map((platform) => platform.id ?? ""));
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : "Failed to load platforms");
+    } finally {
+      setIsLoading(false);
+    }
   }, [isArtist]);
+
+  React.useEffect(() => {
+    loadPlatforms();
+  }, [loadPlatforms]);
 
   const handleTogglePlatform = async (platformId: string) => {
     if (!isArtist) {
@@ -69,9 +173,38 @@ export default function Platforms() {
   return (
     <div className="min-h-screen bg-background text-foreground px-6 py-12 md:px-16 lg:px-24">
       
-      <div className="mb-12">
-        <h1 className="text-4xl font-bold tracking-tight">Platforms</h1>
-        <p className="text-muted-foreground mt-2">Manage your music distribution across streaming platforms</p>
+      <div className="mb-12 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-bold tracking-tight">Platforms</h1>
+          <p className="text-muted-foreground mt-2">Manage your music distribution across streaming platforms</p>
+        </div>
+        {isAdmin && (
+          <Dialog open={addOpen} onOpenChange={setAddOpen}>
+            <DialogTrigger asChild>
+              <Button className="gap-2 rounded-full">
+                <Plus className="w-4 h-4" /> Add Platform
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add Platform</DialogTitle>
+              </DialogHeader>
+              <PlatformForm
+                onSubmit={async (data) => {
+                  setActionLoading(true);
+                  try {
+                    await addPlatform(data);
+                    await loadPlatforms();
+                  } finally {
+                    setActionLoading(false);
+                  }
+                }}
+                onClose={() => setAddOpen(false)}
+                isLoading={actionLoading}
+              />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       {error && (
@@ -133,6 +266,17 @@ export default function Platforms() {
                           : "Connect"}
                     </Button>
                   )}
+                  {isAdmin && platform.id && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setDeleteItem(platform)}
+                      className="rounded-full text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Delete
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
@@ -143,6 +287,45 @@ export default function Platforms() {
           </div>
         )}
       </div>
+
+      <AlertDialog open={!!deleteItem} onOpenChange={(open) => !open && setDeleteItem(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete platform?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the platform "{deleteItem?.name}".
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              disabled={actionLoading}
+              onClick={async (e) => {
+                e.preventDefault();
+                if (!deleteItem?.id) {
+                  return;
+                }
+
+                setActionLoading(true);
+                setError("");
+
+                try {
+                  await deletePlatform(deleteItem.id);
+                  setDeleteItem(null);
+                  await loadPlatforms();
+                } catch (deleteError) {
+                  setError(deleteError instanceof Error ? deleteError.message : "Failed to delete platform");
+                } finally {
+                  setActionLoading(false);
+                }
+              }}
+            >
+              {actionLoading ? "Deleting..." : "Delete Platform"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
