@@ -21,25 +21,25 @@ public class MailService(IOptions<MailConfiguration> mailConfiguration) : IMailS
     public async Task<ServiceResponse> SendMail(string recipientEmail, string subject, string body, bool isHtmlBody = false, 
         string? senderTitle = null, CancellationToken cancellationToken = default)
     {
-        if (!_mailConfiguration.MailEnable) // If you need only to test and not send emails you can set this variable to false, otherwise it will try to send the emails.
+        if (!_mailConfiguration.MailEnable)
         {
             return ServiceResponse.ForSuccess();
         }
 
         var message = new MimeMessage();
-        message.From.Add(new MailboxAddress(senderTitle ?? _mailConfiguration.MailAddress, _mailConfiguration.MailAddress)); // Set the sender alias and sender's real address.
+        message.From.Add(new MailboxAddress(senderTitle ?? _mailConfiguration.MailAddress, _mailConfiguration.MailAddress));
         message.To.Add(new MailboxAddress(recipientEmail, recipientEmail)); // Add the recipient mail address.
         message.Subject = subject; // Set the subject.
-        message.Body = new TextPart(isHtmlBody ? "html" : "plain") { Text = body };  // Set the MIME type and email body.
+        message.Body = new TextPart(isHtmlBody ? "html" : "plain") { Text = body }; 
 
         try
         {
-            using var client = new SmtpClient(); // Create the SMTP client. Note that this object is disposable and as such need to use the keyword "using" to properly dispose the object after leaving the scope.
-            await client.ConnectAsync(_mailConfiguration.MailHost, _mailConfiguration.MailPort, SecureSocketOptions.Auto, cancellationToken); // Connect to the mail host.
-            client.AuthenticationMechanisms.Remove("XOAUTH2"); // Just to avoid issues with some clients this header is removed from the authentication request.
-            await client.AuthenticateAsync(_mailConfiguration.MailUser, _mailConfiguration.MailPassword, cancellationToken); // Set the user and password for the email account.
-            await client.SendAsync(message, cancellationToken); // Send the message.
-            await client.DisconnectAsync(true, cancellationToken); // Disconnect the client from the host to save resources.
+            using var client = new SmtpClient(); =
+            await client.ConnectAsync(_mailConfiguration.MailHost, _mailConfiguration.MailPort, SecureSocketOptions.Auto, cancellationToken);
+            client.AuthenticationMechanisms.Remove("XOAUTH2");
+            await client.AuthenticateAsync(_mailConfiguration.MailUser, _mailConfiguration.MailPassword, cancellationToken); 
+            await client.SendAsync(message, cancellationToken);
+            await client.DisconnectAsync(true, cancellationToken);
         }
         catch
         {
